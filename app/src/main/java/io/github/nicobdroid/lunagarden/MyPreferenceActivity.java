@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
@@ -52,7 +53,24 @@ public class MyPreferenceActivity extends AppCompatActivity {
             bindNotificationPreferenceListener(getString(R.string.settings_notification_enable));
             bindNotificationPreferenceListener(getString(R.string.settings_notification_time));
             bindNotificationPreferenceListener(getString(R.string.settings_notification_nb_days_earlier));
+            bindAppearancePreferenceListener();
 
+        }
+
+        private void bindAppearancePreferenceListener() {
+            ListPreference preference = findPreference(AppearanceModeManager.PREF_APPEARANCE_MODE);
+            if (preference == null) {
+                return;
+            }
+
+            preference.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
+            preference.setOnPreferenceChangeListener((changedPreference, newValue) -> {
+                boolean modeChanged = AppearanceModeManager.applyModeValue(String.valueOf(newValue));
+                if (modeChanged && getActivity() != null) {
+                    getActivity().recreate();
+                }
+                return true;
+            });
         }
 
         private void bindNotificationPreferenceListener(String key) {

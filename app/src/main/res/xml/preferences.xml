@@ -10,6 +10,14 @@
                 android:targetClass="io.github.nicobdroid.lunagarden.settings.FragmentBackStackActivity"
                 android:targetPackage="io.github.nicobdroid.lunagarden" />
         </Preference>
+
+        <ListPreference
+            android:key="settings_appearance_mode"
+            android:title="@string/settings_appearance_title"
+            android:summary="@string/settings_appearance_summary"
+            android:entries="@array/appearance_mode_entries"
+            android:entryValues="@array/appearance_mode_values"
+            android:defaultValue="system" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Notifications">

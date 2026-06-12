@@ -84,6 +84,7 @@ public class Splash extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		/* Default creation code. */
+		AppearanceModeManager.applySavedMode(this);
 		super.onCreate(savedInstanceState);
 
 		/*

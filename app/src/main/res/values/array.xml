@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="appearance_mode_entries">
+        <item>Suivre le systeme</item>
+        <item>Mode clair</item>
+        <item>Mode sombre</item>
+    </string-array>
+
+    <string-array name="appearance_mode_values">
+        <item>system</item>
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+
     <string-array name="listArray">
         <item>0</item>
         <item>1</item>
