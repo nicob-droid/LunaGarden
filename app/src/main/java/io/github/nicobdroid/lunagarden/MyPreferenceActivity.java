@@ -1,5 +1,7 @@
 package io.github.nicobdroid.lunagarden;
 import android.app.job.JobScheduler;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -37,6 +39,7 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preferences);
+            updateAppVersionSummary();
 
             final Preference myPref = (Preference) findPreference(getString(R.string.settings_notification_enable));
             myPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -62,6 +65,24 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
 
             });
 
+        }
+
+        private void updateAppVersionSummary() {
+            Preference appVersionPreference = findPreference(getString(R.string.settings_app_version));
+            if (appVersionPreference == null || getActivity() == null) {
+                return;
+            }
+
+            try {
+                PackageManager packageManager = getActivity().getPackageManager();
+                PackageInfo packageInfo = packageManager.getPackageInfo(getActivity().getPackageName(), 0);
+                String versionName = packageInfo.versionName;
+                if (versionName != null && !versionName.isEmpty()) {
+                    appVersionPreference.setSummary(versionName);
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.w(TAG, "Unable to read app version", e);
+            }
         }
     }
 

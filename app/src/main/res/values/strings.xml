@@ -52,10 +52,23 @@
 	\nL’influence de la Lune n’étant pas profitable durant ces moments, il est déconseillé de jardiner 5h avant et après ces nœuds.</string>
 	
     <string name="settings">Paramètres</string>
+    <string name="about_app_version_title">Version de l\'application</string>
+    <string name="about_app_version_unknown">Version indisponible</string>
+    <string name="legal_information_category_title">Informations légales</string>
+    <string name="legal_terms_title">Conditions d\'utilisation</string>
+    <string name="legal_terms_summary">Consulter les conditions d\'utilisation</string>
+    <string name="legal_privacy_title">Politique de confidentialité</string>
+    <string name="legal_privacy_summary">Consulter la politique de confidentialité</string>
+    <string name="legal_terms_url">file:///android_asset/legal/terms-fr.html</string>
+    <string name="legal_privacy_url">file:///android_asset/legal/privacy-fr.html</string>
     <string name="configuration">Configuration</string>
     <string name="reconfiguration_message">Il est possible de reconfigurer les légumes de votre jardin idéal à tout moment.</string>
     <string name="notification_time_message">Spécifier l\'heure de notification pour être prévenu d\'une eventuelle action à effectuer dans votre jardin.</string>
-    <string name="notification_days_earlier_message">Il est possible de recevoir une notification avec un ou plusieurs jours à l\'avance pour optimiser l\organisation de votre jardin idéal.</string>
+    <string name="notification_days_earlier_message">Il est possible de recevoir une notification avec un ou plusieurs jours à l\'avance pour optimiser l\'organisation de votre jardin idéal.</string>
+    <plurals name="notification_days_earlier_current_value">
+        <item quantity="one">Actuellement : %1$d jour d\'avance</item>
+        <item quantity="other">Actuellement : %1$d jours d\'avance</item>
+    </plurals>
 
     <string name="result_sow_item">Vous pouvez semer: </string>
 

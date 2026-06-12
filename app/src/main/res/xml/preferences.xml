@@ -27,23 +27,58 @@
             android:defaultValue="10:00"
             />
 
-        <ListPreference
+        <io.github.nicobdroid.lunagarden.NumberPickerPreference
             android:icon="@drawable/chou_pomme_automne"
             android:defaultValue="0"
-            android:entries="@array/listArray"
-            android:entryValues="@array/listValues"
             android:key="@string/settings_notification_nb_days_earlier"
             android:summary="@string/notification_days_earlier_message"
             android:title="Notifier 0, 1 ou plusieurs jours à l'avance" />
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/legal_information_category_title">
+        <Preference
+            android:icon="@drawable/carotte"
+            android:summary="@string/legal_terms_summary"
+            android:title="@string/legal_terms_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="io.github.nicobdroid.lunagarden.LegalDocumentActivity"
+                android:targetPackage="io.github.nicobdroid.lunagarden">
+                <extra
+                    android:name="legal_document_title"
+                    android:value="@string/legal_terms_title" />
+                <extra
+                    android:name="legal_document_url"
+                    android:value="@string/legal_terms_url" />
+            </intent>
+        </Preference>
+
+        <Preference
+            android:icon="@drawable/chou_pomme_ete"
+            android:summary="@string/legal_privacy_summary"
+            android:title="@string/legal_privacy_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="io.github.nicobdroid.lunagarden.LegalDocumentActivity"
+                android:targetPackage="io.github.nicobdroid.lunagarden">
+                <extra
+                    android:name="legal_document_title"
+                    android:value="@string/legal_privacy_title" />
+                <extra
+                    android:name="legal_document_url"
+                    android:value="@string/legal_privacy_url" />
+            </intent>
+        </Preference>
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="A propos">
-        <EditTextPreference
+        <Preference
             android:icon="@drawable/tournesol"
-            android:key="username"
-            android:summary="Please provide your username"
-            android:title="Your Name">
-        </EditTextPreference>
+            android:key="@string/settings_app_version"
+            android:persistent="false"
+            android:selectable="false"
+            android:summary="@string/about_app_version_unknown"
+            android:title="@string/about_app_version_title" />
 
     </PreferenceCategory>
 </PreferenceScreen>

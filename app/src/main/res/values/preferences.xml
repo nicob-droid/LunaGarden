@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sharedpref_root_veg">RootVeg_Preferences</string>
-    <string name="sharedpref_leaf_veg">LeafVeg_Preferences</string>
-    <string name="sharedpref_fruit_veg">FruitVeg_Preferences</string>
+    <string name="sharedpref_root_veg" translatable="false">RootVeg_Preferences</string>
+    <string name="sharedpref_leaf_veg" translatable="false">LeafVeg_Preferences</string>
+    <string name="sharedpref_fruit_veg" translatable="false">FruitVeg_Preferences</string>
 
-    <string name="settings_root_veg_enable">settings_root_veg_enable</string>
-    <string name="settings_leaf_veg_enable">settings_leaf_veg_enable</string>
-    <string name="settings_fruit_veg_enable">settings_fruit_veg_enable</string>
-    <string name="settings_done">settings_done</string>
+    <string name="settings_root_veg_enable" translatable="false">settings_root_veg_enable</string>
+    <string name="settings_leaf_veg_enable" translatable="false">settings_leaf_veg_enable</string>
+    <string name="settings_fruit_veg_enable" translatable="false">settings_fruit_veg_enable</string>
+    <string name="settings_done" translatable="false">settings_done</string>
 
-    <string name="settings_notification_enable">settings_notification_enable</string>
-    <string name="settings_notification_time">settings_notification_time</string>
-    <string name="settings_notification_nb_days_earlier">settings_notification_nb_days_earlier</string>
+    <string name="settings_notification_enable" translatable="false">settings_notification_enable</string>
+    <string name="settings_notification_time" translatable="false">settings_notification_time</string>
+    <string name="settings_notification_nb_days_earlier" translatable="false">settings_notification_nb_days_earlier</string>
+    <string name="settings_app_version" translatable="false">settings_app_version</string>
 
-    <string name="default_root_veg_enable">No</string>
-    <string name="default_leaf_veg_enable">No</string>
-    <string name="default_fruit_veg_enable">No</string>
-    <string name="default_root_veg_item">false</string>
-    <string name="default_leaf_veg_item">false</string>
-    <string name="default_fruit_veg_item">false</string>
+    <string name="default_root_veg_enable" translatable="false">No</string>
+    <string name="default_leaf_veg_enable" translatable="false">No</string>
+    <string name="default_fruit_veg_enable" translatable="false">No</string>
+    <string name="default_root_veg_item" translatable="false">false</string>
+    <string name="default_leaf_veg_item" translatable="false">false</string>
+    <string name="default_fruit_veg_item" translatable="false">false</string>
 
 </resources>

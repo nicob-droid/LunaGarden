@@ -39,6 +39,10 @@
             android:configChanges="orientation|screenSize">
         </activity>
         <activity
+            android:name=".LegalDocumentActivity"
+            android:configChanges="orientation|screenSize">
+        </activity>
+        <activity
             android:name=".notificationscheduler.NotificationSchedulerActivity"
             android:configChanges="orientation|screenSize" >
         </activity>
