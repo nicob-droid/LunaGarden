@@ -49,6 +49,7 @@ public class ActivityDay extends AppCompatActivity {
         title.setText(strCurrentDate);
         ImageView moonView = findViewById(R.id.moonView);
         moonView.setImageResource(iMoonView);
+        moonView.setContentDescription(getString(R.string.a11y_moon_for_day, strCurrentDate));
         mFruitListview = findViewById(R.id.listview);
         mFruitList = aListIdSow;// FruitVegManager.getFruitItemList(getContext());
         populateFruitList(mFruitList);

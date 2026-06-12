@@ -105,4 +105,17 @@
     <string name="notification_default_text">Consultez les actions du jour.</string>
     <string name="notification_debug_post_execute">postExecute</string>
 
+    <string name="a11y_moon_image">Icône de la lune</string>
+    <string name="a11y_moon_phase_icon">Phase de lune</string>
+    <string name="a11y_sowing_icon">Indicateur de semis</string>
+    <string name="a11y_harvest_icon">Indicateur de récolte</string>
+    <string name="a11y_vegetable_image">Illustration du légume</string>
+    <string name="a11y_result_image">Illustration action</string>
+    <string name="a11y_moon_phase_for_date">Phase de lune pour %1$s</string>
+    <string name="a11y_sowing_for_date">Semis pour %1$s</string>
+    <string name="a11y_harvest_for_date">Récolte pour %1$s</string>
+    <string name="a11y_moon_for_day">Lune du %1$s</string>
+    <string name="a11y_vegetable_image_named">Illustration de %1$s</string>
+    <string name="a11y_result_image_named">Illustration pour %1$s</string>
+
 </resources>

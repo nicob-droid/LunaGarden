@@ -69,6 +69,9 @@ public class CalendarAdapter extends BaseAdapter {
         tvDate.setText(date);
         tvAction.setText(action);
         ivCollect.setImageResource(iCollect);
+        ivMoon.setContentDescription(context.getString(R.string.a11y_moon_phase_for_date, date));
+        ivWork.setContentDescription(context.getString(R.string.a11y_sowing_for_date, date));
+        ivCollect.setContentDescription(context.getString(R.string.a11y_harvest_for_date, date));
 
         return vg;
     }

@@ -16,6 +16,7 @@ public class ResultVegListAdapter extends BaseAdapter {
 
     // The LayoutInflater to holds layout inflater to inflate list item.
     private LayoutInflater mLayoutInflater;
+    private final Context mContext;
 
 
     /**
@@ -25,6 +26,7 @@ public class ResultVegListAdapter extends BaseAdapter {
      * @param list
      */
     public ResultVegListAdapter(Context context, ArrayList<ResultVegItem> list) {
+        mContext = context;
         mItemsList = list;
         mLayoutInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -96,6 +98,9 @@ public class ResultVegListAdapter extends BaseAdapter {
             viewHolder.sub_textview.setText(item.getSubMessage());
             viewHolder.profile_imageview.setBackgroundResource(item
                     .getPictureResId());
+            viewHolder.profile_imageview.setContentDescription(
+                    mContext.getString(R.string.a11y_result_image_named, item.getMainMessage())
+            );
 
             if (item.getAction() == ResultVegItem.RESULT_VEG_ITEM_SOW) {
                 Objects.requireNonNull(viewHolder).header_textview.setTextColor(0xFF00FF99);

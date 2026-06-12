@@ -19,6 +19,7 @@ public class VegListAdapter extends BaseAdapter {
 
     // The LayoutInflater to holds layout inflater to inflate list item.
     private LayoutInflater mLayoutInflater;
+    private final Context mContext;
 
     // The OnMessageClickListener of listener.
     private OnFruitItemClickListener listener;
@@ -30,6 +31,7 @@ public class VegListAdapter extends BaseAdapter {
      * @param list
      */
     public VegListAdapter(Context context, ArrayList<VegItem> list) {
+        mContext = context;
         mItemsList = list;
         mLayoutInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -120,6 +122,9 @@ public class VegListAdapter extends BaseAdapter {
             viewHolder.sub_textview.setText(item.getMessage());
             viewHolder.profile_imageview.setBackgroundResource(item
                     .getPictureResId());
+            viewHolder.profile_imageview.setContentDescription(
+                    mContext.getString(R.string.a11y_vegetable_image_named, item.getFruitname())
+            );
 
             viewHolder.checkbox.setTag(position);
             viewHolder.checkbox.setChecked(item.isCheckboxChecked());

@@ -21,7 +21,8 @@
         android:id="@+id/moonView"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_toStartOf="@id/title"/>
+        android:layout_toStartOf="@id/title"
+        android:contentDescription="@string/a11y_moon_image" />
 
     <View
         android:id="@+id/divider"
