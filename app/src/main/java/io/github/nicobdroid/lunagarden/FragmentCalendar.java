@@ -1,11 +1,8 @@
 package io.github.nicobdroid.lunagarden;
-import static android.content.Context.ALARM_SERVICE;
 
 import static io.github.nicobdroid.lunagarden.ResultVegItem.RESULT_VEG_ITEM_FORBIDDEN;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,9 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -92,79 +86,6 @@ public class FragmentCalendar extends Fragment {
             mExternalContext = context.getApplicationContext();
         }
     }
-    private void setAlarmForNotifyUser() {
-        // get notification time
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String strNotificationTime = prefs.getString(
-                getString(R.string.settings_notification_time),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_TIME
-        );
-        Log.d(TAG, "onResume: strNotificationTime = " + strNotificationTime);
-
-        // get notification nb days earlier
-        String strNotificationDaysEarlier = prefs.getString(
-                getString(R.string.settings_notification_nb_days_earlier),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_NB_DAYS_EARLIER
-        );
-        int iNotificationDaysEarlier = Integer.valueOf(strNotificationDaysEarlier);
-        Log.d(TAG, "onResume: iNotificationDaysEarlier = " + iNotificationDaysEarlier);
-
-        String[] dateArray = strNotificationTime.split(":");
-        int hour = Integer.parseInt(dateArray[0]);
-        int minute = Integer.parseInt(dateArray[1]);
-
-        Calendar cal_dateToSurvey = Calendar.getInstance();
-        Date date = new Date();//initializes to now
-        cal_dateToSurvey.setTime(date);
-        cal_dateToSurvey.add(Calendar.DAY_OF_MONTH, iNotificationDaysEarlier);
-        cal_dateToSurvey.set(Calendar.HOUR_OF_DAY, hour);
-        cal_dateToSurvey.set(Calendar.MINUTE, minute);
-        cal_dateToSurvey.set(Calendar.SECOND, 0);
-
-//        Calendar calendar = Calendar.getInstance();
-
-        FragmentCalendar fragmentCalendar = new FragmentCalendar();
-        ArrayList<ResultVegItem> mResultArray;
-        ArrayList<ResultVegItem> collectArray;
-        if (fragmentCalendar.isDayRacine(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = RootVegManager.getResultVegForSow(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = RootVegManager.getResultVegForCollect(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-            for (int i = 0; i < mResultArray.size(); i++) {
-                Toast.makeText(getContext(), mResultArray.get(i).getMainMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-
-
-
-        } else if (fragmentCalendar.isDayFeuille(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = LeafVegManager.getResultVegForSow(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = LeafVegManager.getResultVegForCollect(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-
-        } else if (fragmentCalendar.isDayFruit(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = FruitVegManager.getResultVegForSow(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = FruitVegManager.getResultVegForCollect(getContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-
-        }
-
-        AlarmManager am = (AlarmManager) requireContext().getSystemService(ALARM_SERVICE);
-        Intent i = new Intent(getContext(), NotificationService.class);
-        PendingIntent pi = PendingIntent.getService(getContext(), 0, i, PendingIntent.FLAG_IMMUTABLE);
-        if (am != null) {
-            am.cancel(pi);
-        }
-//        am.set(AlarmManager.RTC, cal_alarm.getTimeInMillis(), pi);
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,8 +97,6 @@ public class FragmentCalendar extends Fragment {
         Bundle args = requireArguments();
         mMonthId = args.getInt("month", 0);
         mYearId = args.getInt("year", 2018);
-
-//        setAlarmForNotifyUser();
     }
 
     @Override

@@ -1,38 +1,18 @@
 package io.github.nicobdroid.lunagarden;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
-
-import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
-import io.github.nicobdroid.lunagarden.settings.LeafVegManager;
-import io.github.nicobdroid.lunagarden.settings.RootVegManager;
 
 public class ActivityCalendar extends AppCompatActivity {
-    private static final String TAG = "ActivityCalendar";
-    private static final int JOB_ID = 52;
-    private JobScheduler mScheduler;
     FragmentPagerAdapter adapterViewPager;
 
     @Override
@@ -45,7 +25,6 @@ public class ActivityCalendar extends AppCompatActivity {
         vpPager.setAdapter(adapterViewPager);
         vpPager.setCurrentItem(2);
 
-        mScheduler = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
     }
 
 
@@ -177,9 +156,6 @@ public class ActivityCalendar extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-        //setAlarmForNotifyUser();
-
         startJobScheduler();
     }
 
@@ -205,96 +181,6 @@ public class ActivityCalendar extends AppCompatActivity {
         return false;
     }
 
-
-    private void setAlarmForNotifyUser() {
-        // get notification time
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String strNotificationTime = prefs.getString(
-                getString(R.string.settings_notification_time),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_TIME
-        );
-        Log.d(TAG, "onResume: strNotificationTime = " + strNotificationTime);
-
-        // get notification nb days earlier
-        String strNotificationDaysEarlier = prefs.getString(
-                getString(R.string.settings_notification_nb_days_earlier),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_NB_DAYS_EARLIER
-        );
-        int iNotificationDaysEarlier = Integer.valueOf(strNotificationDaysEarlier);
-        Log.d(TAG, "onResume: iNotificationDaysEarlier = " + iNotificationDaysEarlier);
-
-        String[] dateArray = strNotificationTime.split(":");
-        int hour = Integer.parseInt(dateArray[0]);
-        int minute = Integer.parseInt(dateArray[1]);
-
-        Calendar cal_dateToSurvey = Calendar.getInstance();
-        Date date = new Date();//initializes to now
-        cal_dateToSurvey.setTime(date);
-        cal_dateToSurvey.add(Calendar.DAY_OF_MONTH, iNotificationDaysEarlier);
-        cal_dateToSurvey.set(Calendar.HOUR_OF_DAY, hour);
-        cal_dateToSurvey.set(Calendar.MINUTE, minute);
-        cal_dateToSurvey.set(Calendar.SECOND, 0);
-
-        Calendar calendar = Calendar.getInstance();
-        Calendar setcalendar = Calendar.getInstance();
-        setcalendar.set(Calendar.HOUR_OF_DAY, hour);
-        setcalendar.set(Calendar.MINUTE, minute);
-        setcalendar.set(Calendar.SECOND, 0);
-        if(setcalendar.before(calendar))
-            setcalendar.add(Calendar.DATE,1);
-
-        FragmentCalendar fragmentCalendar = new FragmentCalendar();
-        fragmentCalendar.setExternalContext(getApplicationContext());
-        ArrayList<ResultVegItem> mResultArray = new ArrayList<>();
-        ArrayList<ResultVegItem> collectArray;
-        if (fragmentCalendar.isDayRacine(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = RootVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = RootVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-//            for (int i = 0; i < mResultArray.size(); i++) {
-//                Toast.makeText(getApplicationContext(), mResultArray.get(i).getMainMessage(), Toast.LENGTH_SHORT).show();
-//            }
-
-        } else if (fragmentCalendar.isDayFeuille(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = LeafVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = LeafVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-
-        } else if (fragmentCalendar.isDayFruit(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = FruitVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = FruitVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-        }
-
-
-        AlarmManager am = (AlarmManager) Objects.requireNonNull(getApplicationContext()).getSystemService(ALARM_SERVICE);
-        Intent i = new Intent(getApplicationContext(), NotificationService.class);
-        // put extra intent
-        if (!mResultArray.isEmpty()) {
-            i.putExtra(AppTechnicalKeys.NOTIFICATION_EXTRA_TITLE, mResultArray.get(0).getMainMessage());
-        }
-
-
-        PendingIntent pi = PendingIntent.getService(
-                getApplicationContext(),
-                0,
-                i,
-                PendingIntent.FLAG_IMMUTABLE
-        );
-
-
-        Objects.requireNonNull(am).cancel(pi);
-//        am.set(AlarmManager.RTC, cal_alarm.getTimeInMillis(), pi);
-
-        am.setInexactRepeating(AlarmManager.RTC_WAKEUP, setcalendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, pi);
-
-    }
 
     private void startJobScheduler() {
         NotificationJobService.scheduleNextJob(getApplicationContext());

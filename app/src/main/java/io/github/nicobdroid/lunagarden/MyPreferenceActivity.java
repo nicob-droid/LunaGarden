@@ -1,5 +1,4 @@
 package io.github.nicobdroid.lunagarden;
-import android.app.job.JobScheduler;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -62,11 +61,6 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
                     if (getString(R.string.settings_notification_enable).equals(changedPreference.getKey())
                             && newValue instanceof Boolean
                             && !((Boolean) newValue)) {
-                        JobScheduler mJobScheduler = (JobScheduler) getActivity()
-                                .getSystemService(JOB_SCHEDULER_SERVICE);
-                        if (mJobScheduler != null) {
-                            mJobScheduler.cancelAll();
-                        }
                         NotificationJobService.cancelScheduledJob(getActivity());
                     } else {
                         NotificationJobService.scheduleNextJob(getActivity());
