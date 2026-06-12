@@ -13,7 +13,7 @@
 
     <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
         <item name="titleTextStyle">@style/MyTitleTextStyle</item>
-        <item name="logo">@mipmap/ic_launcher</item>
+<!--        <item name="logo">@mipmap/ic_launcher</item>-->
         <item name="displayOptions">useLogo|showHome|showTitle</item>
     </style>
 

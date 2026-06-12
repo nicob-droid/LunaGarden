@@ -5,6 +5,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
 import android.util.Log;
+import android.view.MenuItem;
+import androidx.appcompat.app.ActionBar;
 
 public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
     private static final String TAG = "MyPreferenceActivity";
@@ -14,6 +16,20 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
         setTitle(R.string.settings);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public static class MyPreferenceFragment extends PreferenceFragment {

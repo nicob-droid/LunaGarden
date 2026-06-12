@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.WindowManager;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -28,6 +26,19 @@ public class FragmentBackStackActivity extends AppCompatActivity {
 
         manageScreenOrientation();
 
+        // Gestion du bouton retour via OnBackPressedDispatcher (AndroidX)
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Log.d(TAG, "handleOnBackPressed");
+                int count = getSupportFragmentManager().getBackStackEntryCount();
+                if (count == 0) {
+                    finish();
+                } else {
+                    getSupportFragmentManager().popBackStack();
+                }
+            }
+        });
 
         // Get FragmentManager and FragmentTransaction object.
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -41,29 +52,12 @@ public class FragmentBackStackActivity extends AppCompatActivity {
         fragmentTransaction.commit();
 
         FragmentUtil.printActivityFragmentList(fragmentManager);
-
     }
 
-
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
-        // Checks the orientation of the screen
         manageScreenOrientation();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.d(TAG, "onBackPressed");
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
-            super.onBackPressed();
-            //additional code
-        } else {
-            getFragmentManager().popBackStack();
-        }
     }
 
     private void manageScreenOrientation() {
@@ -84,4 +78,3 @@ public class FragmentBackStackActivity extends AppCompatActivity {
         getWindow().setLayout(layoutParams.width, layoutParams.height);
     }
 }
-
