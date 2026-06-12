@@ -18,18 +18,13 @@ public class VegListAdapter extends BaseAdapter {
     private ArrayList<VegItem> mItemsList;
 
     // The LayoutInflater to holds layout inflater to inflate list item.
-    private LayoutInflater mLayoutInflater;
+    private final LayoutInflater mLayoutInflater;
     private final Context mContext;
 
     // The OnMessageClickListener of listener.
     private OnFruitItemClickListener listener;
 
-    /**
-     * Constructor.
-     *
-     * @param context
-     * @param list
-     */
+
     public VegListAdapter(Context context, ArrayList<VegItem> list) {
         mContext = context;
         mItemsList = list;
@@ -38,11 +33,6 @@ public class VegListAdapter extends BaseAdapter {
 
     }
 
-    /**
-     * Method to set item list and notify adapter to update its views.
-     *
-     * @param list
-     */
     public void setItemlist(ArrayList<VegItem> list) {
         mItemsList = list;
         notifyDataSetChanged();
@@ -60,7 +50,7 @@ public class VegListAdapter extends BaseAdapter {
     @Override
     public VegItem getItem(int position) {
         VegItem item = null;
-        if (mItemsList != null && mItemsList.size() > 0) {
+        if (mItemsList != null && !mItemsList.isEmpty()) {
             item = mItemsList.get(position);
         }
         return item;
@@ -71,11 +61,6 @@ public class VegListAdapter extends BaseAdapter {
         return position;
     }
 
-    /**
-     * Method to set the listener class object.
-     *
-     * @param listener
-     */
     public void setOnFruitClickListener(OnFruitItemClickListener listener) {
         this.listener = listener;
     }
@@ -87,32 +72,16 @@ public class VegListAdapter extends BaseAdapter {
      *
      */
     public interface OnFruitItemClickListener {
-
-        /**
-         * The method declaration for user selected. This method will be fired
-         * when user click on check/uncheck the checkbox on the list item.
-         *
-         * @param position
-         * @param item
-         */
-        public void onCheckboxClicked(int position, VegItem item);
-
+        void onCheckboxClicked(int position, VegItem item);
     }
 
-    /**
-     *
-     * @return update list from array list.
-     */
-    public ArrayList<VegItem> getUpdatedList() {
-        return mItemsList;
-    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
         if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.fruit_item_layout, null);
-            new ViewHolder(convertView, listener);
+            new ViewHolder(convertView);
         }
 
         ViewHolder viewHolder = (ViewHolder) convertView.getTag();
@@ -128,13 +97,7 @@ public class VegListAdapter extends BaseAdapter {
 
             viewHolder.checkbox.setTag(position);
             viewHolder.checkbox.setChecked(item.isCheckboxChecked());
-            viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    listener.onCheckboxClicked(position, item);
-                }
-            });
+            viewHolder.checkbox.setOnClickListener(view -> listener.onCheckboxClicked(position, item));
 
         }
         return convertView;
@@ -152,11 +115,11 @@ public class VegListAdapter extends BaseAdapter {
         ImageView profile_imageview;
         CheckBox checkbox;
 
-        public ViewHolder(View v, OnFruitItemClickListener listener) {
-            header_textview = (TextView) v.findViewById(R.id.header_textview);
-            sub_textview = (TextView) v.findViewById(R.id.sub_textview);
-            profile_imageview = (ImageView) v.findViewById(R.id.profile_imageview);
-            checkbox = (CheckBox) v.findViewById(R.id.checkbox_imageview);
+        public ViewHolder(View v) {
+            header_textview = v.findViewById(R.id.header_textview);
+            sub_textview = v.findViewById(R.id.sub_textview);
+            profile_imageview = v.findViewById(R.id.profile_imageview);
+            checkbox = v.findViewById(R.id.checkbox_imageview);
             v.setTag(this);
         }
     }

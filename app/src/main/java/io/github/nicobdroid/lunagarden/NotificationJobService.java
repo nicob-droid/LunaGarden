@@ -26,7 +26,7 @@ import io.github.nicobdroid.lunagarden.settings.RootVegManager;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+
 
 public class NotificationJobService extends JobService {
     private static final String TAG = "NotificationJobService";
@@ -179,7 +179,7 @@ public class NotificationJobService extends JobService {
 
         int hour = 10;
         int minute = 0;
-        if (notificationTime != null && notificationTime.contains(":")) {
+        if (notificationTime.contains(":")) {
             String[] dateArray = notificationTime.split(":");
             if (dateArray.length == 2) {
                 try {

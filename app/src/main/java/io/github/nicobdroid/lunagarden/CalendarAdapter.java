@@ -9,12 +9,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class CalendarAdapter extends BaseAdapter {
-    private Context context;
-    private ArrayList<String> dates, actions;
-    private ArrayList<Integer> moons;
-    private ArrayList<Integer> semis;
-    private ArrayList<Integer> collects;
-    private LayoutInflater inflater;
+    private final Context context;
+    private final ArrayList<String> dates;
+    private final ArrayList<String> actions;
+    private final ArrayList<Integer> moons;
+    private final ArrayList<Integer> semis;
+    private final ArrayList<Integer> collects;
+    private final LayoutInflater inflater;
 
     public CalendarAdapter(Context context, ArrayList<String> dates, ArrayList<Integer> moons,
                            ArrayList<Integer> semis, ArrayList<Integer> collects, ArrayList<String> actions) {

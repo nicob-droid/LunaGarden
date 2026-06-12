@@ -7,6 +7,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.Collections;
@@ -62,7 +64,7 @@ public class Splash extends AppCompatActivity {
 			permissions = getPackageManager().getPackageInfo(getPackageName(),
 					PackageManager.GET_PERMISSIONS).requestedPermissions;
 		} catch (NameNotFoundException e) {
-			e.printStackTrace();
+			Log.e(TAG, "[getRequiredPermissions] Failed to get permissions from manifest", e);
 		}
 		if (permissions == null) {
 			return new String[0];

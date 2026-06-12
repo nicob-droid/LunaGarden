@@ -19,7 +19,7 @@ public class NotificationUtils extends ContextWrapper {
     public void createChannels() {
 
         // create android channel
-        NotificationChannel androidChannel = null;
+        NotificationChannel androidChannel;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             androidChannel = new NotificationChannel(ANDROID_CHANNEL_ID,
                     getString(R.string.notification_android_channel_name), NotificationManager.IMPORTANCE_DEFAULT);

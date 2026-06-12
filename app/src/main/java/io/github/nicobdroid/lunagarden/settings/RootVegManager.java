@@ -2,8 +2,6 @@ package io.github.nicobdroid.lunagarden.settings;
 
 import android.content.Context;
 import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Random;
 import io.github.nicobdroid.lunagarden.R;
 import io.github.nicobdroid.lunagarden.ResultVegItem;
 
@@ -108,7 +106,7 @@ public class RootVegManager {
         String[] messages = getMessages(context);
         int itemCount = getItemCount(titles, messages);
 
-        ArrayList<VegItem> list = new ArrayList<VegItem>();
+        ArrayList<VegItem> list = new ArrayList<>();
         RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
         for (int i = 0; i < itemCount; i++) {
             VegItem item = new VegItem();
@@ -244,57 +242,14 @@ public class RootVegManager {
         return result;
     }
 
-    public static ArrayList<Integer> getListIdEnabledForSow(Context context, int month) {
-        String[] titles = getTitles(context);
-        int itemCount = getItemCount(titles);
-
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
-        for (int i = 0; i < itemCount; i++) {
-            if (isTimeToSow(i, month)) {
-                if (rootVegPrefs.isItemEnabled(ITEM_KEYS[i], titles[i])) {
-                    result.add(i);
-                }
-            }
-        }
-        return result;
-    }
-
     private static boolean isTimeToSow(int i, int month) {
-        boolean result = false;
-        if (semis[i][month]) {
-            result = true;
-        }
-        return result;
+        return semis[i][month];
     }
 
     private static boolean isTimeToCollect(int i, int month) {
-        boolean result = false;
-        if (recoltes[i][month]) {
-            result = true;
-        }
-        return result;
+        return recoltes[i][month];
     }
 
-    /**
-     * Method to get new fruits<FruitItem>, generated just to show demo with
-     * localized fruit names and messages randomly.
-     *
-     * @return item
-     */
-    public static VegItem getRandomItem(Context context) {
-        String[] titles = getTitles(context);
-        String[] messages = getMessages(context);
-        int itemCount = getItemCount(titles, messages);
-
-        VegItem item = new VegItem();
-        int randomValue = new Random().nextInt(itemCount);
-        item.setPreferenceKey(ITEM_KEYS[randomValue]);
-        item.setFruitname(titles[randomValue]);
-        item.setMessage(messages[randomValue]);
-        item.setPictureResId(pictures[randomValue]);
-        return item;
-    }
 
     private static String[] getTitles(Context context) {
         return context.getResources().getStringArray(R.array.root_veg_titles);
@@ -314,9 +269,6 @@ public class RootVegManager {
 
     private static int getItemCount(String[]... arrays) {
         int expected = ITEM_KEYS.length;
-        if (pictures.length != expected || semis.length != expected || recoltes.length != expected) {
-            throw new IllegalStateException("RootVegManager configuration is inconsistent.");
-        }
 
         for (String[] array : arrays) {
             if (array.length != expected) {

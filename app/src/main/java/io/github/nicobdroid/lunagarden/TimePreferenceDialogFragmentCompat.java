@@ -1,11 +1,12 @@
 package io.github.nicobdroid.lunagarden;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TimePicker;
 
 import androidx.preference.PreferenceDialogFragmentCompat;
+
+import org.jetbrains.annotations.NotNull;
 
 public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
     private TimePicker picker;
@@ -19,14 +20,14 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     @Override
-    protected View onCreateDialogView(android.content.Context context) {
+    protected View onCreateDialogView(@NotNull android.content.Context context) {
         picker = new TimePicker(context);
         picker.setIs24HourView(true);
         return picker;
     }
 
     @Override
-    protected void onBindDialogView(View view) {
+    protected void onBindDialogView(@NotNull View view) {
         super.onBindDialogView(view);
         TimePreference preference = (TimePreference) getPreference();
         setTime(preference.getLastHour(), preference.getLastMinute());
@@ -43,27 +44,16 @@ public class TimePreferenceDialogFragmentCompat extends PreferenceDialogFragment
     }
 
     private void setTime(int hour, int minute) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            picker.setHour(hour);
-            picker.setMinute(minute);
-        } else {
-            picker.setCurrentHour(hour);
-            picker.setCurrentMinute(minute);
-        }
+        picker.setHour(hour);
+        picker.setMinute(minute);
     }
 
     private int getHour() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return picker.getHour();
-        }
-        return picker.getCurrentHour();
+        return picker.getHour();
     }
 
     private int getMinute() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return picker.getMinute();
-        }
-        return picker.getCurrentMinute();
+        return picker.getMinute();
     }
 }
 

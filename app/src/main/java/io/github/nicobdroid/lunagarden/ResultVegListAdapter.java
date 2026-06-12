@@ -15,16 +15,10 @@ public class ResultVegListAdapter extends BaseAdapter {
     private ArrayList<ResultVegItem> mItemsList;
 
     // The LayoutInflater to holds layout inflater to inflate list item.
-    private LayoutInflater mLayoutInflater;
+    private final LayoutInflater mLayoutInflater;
     private final Context mContext;
 
 
-    /**
-     * Constructor.
-     *
-     * @param context
-     * @param list
-     */
     public ResultVegListAdapter(Context context, ArrayList<ResultVegItem> list) {
         mContext = context;
         mItemsList = list;
@@ -33,11 +27,6 @@ public class ResultVegListAdapter extends BaseAdapter {
 
     }
 
-    /**
-     * Method to set item list and notify adapter to update its views.
-     *
-     * @param list
-     */
     public void setItemlist(ArrayList<ResultVegItem> list) {
         mItemsList = list;
         notifyDataSetChanged();
@@ -55,7 +44,7 @@ public class ResultVegListAdapter extends BaseAdapter {
     @Override
     public ResultVegItem getItem(int position) {
         ResultVegItem item = null;
-        if (mItemsList != null && mItemsList.size() > 0) {
+        if (mItemsList != null && !mItemsList.isEmpty()) {
             item = mItemsList.get(position);
         }
         return item;
@@ -67,14 +56,6 @@ public class ResultVegListAdapter extends BaseAdapter {
     }
 
 
-    /**
-     *
-     * @return update list from array list.
-     */
-    public ArrayList<ResultVegItem> getUpdatedList() {
-        return mItemsList;
-    }
-
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -82,11 +63,11 @@ public class ResultVegListAdapter extends BaseAdapter {
             ViewHolder viewHolder = new ViewHolder();
             view = mLayoutInflater.inflate(R.layout.result_list_layout, parent,
                     false);
-            viewHolder.header_textview = (TextView) view
+            viewHolder.header_textview = view
                     .findViewById(R.id.header_textview);
-            viewHolder.sub_textview = (TextView) view
+            viewHolder.sub_textview = view
                     .findViewById(R.id.sub_textview);
-            viewHolder.profile_imageview = (ImageView) view
+            viewHolder.profile_imageview = view
                     .findViewById(R.id.profile_imageview);
             view.setTag(viewHolder);
         }

@@ -20,7 +20,7 @@ public class ActivityCalendar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewPager vpPager = (ViewPager) findViewById(R.id.vpPager);
+        ViewPager vpPager = findViewById(R.id.vpPager);
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager(), getApplicationContext());
         vpPager.setAdapter(adapterViewPager);
         vpPager.setCurrentItem(2);
@@ -30,7 +30,7 @@ public class ActivityCalendar extends AppCompatActivity {
 
 
     public static class MyPagerAdapter extends FragmentPagerAdapter {
-        private static int NUM_ITEMS = 6;
+        private static final int NUM_ITEMS = 6;
         Context mContext;
         static int actualMonth = Calendar.getInstance().get(Calendar.MONTH);
         static int actualYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -140,12 +140,12 @@ public class ActivityCalendar extends AppCompatActivity {
             }
 
             if ((position + actualMonth - 2) > Calendar.DECEMBER) {
-                strPageTitle += " " + String.valueOf(actualYear + 1);
+                strPageTitle += " " + (actualYear + 1);
             } else if ((position + actualMonth - 2) < Calendar.JANUARY) {
-                strPageTitle += " " + String.valueOf(actualYear - 1);
+                strPageTitle += " " + (actualYear - 1);
             }
             else {
-                strPageTitle += " " + String.valueOf(actualYear);
+                strPageTitle += " " + actualYear;
             }
 
             return strPageTitle;

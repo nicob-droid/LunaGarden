@@ -41,10 +41,6 @@ public class VegItem implements Serializable {
         return fruitname;
     }
 
-    /**
-     *
-     * @param fruitname
-     */
     public void setFruitname(String fruitname) {
         this.fruitname = fruitname;
     }
@@ -57,10 +53,6 @@ public class VegItem implements Serializable {
         return message;
     }
 
-    /**
-     *
-     * @param message
-     */
     public void setMessage(String message) {
         this.message = message;
     }
@@ -74,10 +66,6 @@ public class VegItem implements Serializable {
         return isCheckboxChecked;
     }
 
-    /**
-     *
-     * @param isCheckboxChecked
-     */
     public void setCheckboxChecked(boolean isCheckboxChecked) {
         this.isCheckboxChecked = isCheckboxChecked;
     }

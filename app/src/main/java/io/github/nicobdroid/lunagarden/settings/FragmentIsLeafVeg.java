@@ -1,17 +1,13 @@
 package io.github.nicobdroid.lunagarden.settings;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioButton;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -36,21 +32,11 @@ public class FragmentIsLeafVeg extends Fragment {
         radiobuttonYes = retView.findViewById(R.id.radiobuttonYes);
         radiobuttonYes.setChecked(leafVegPrefs.isLeafVegEnabled());
 
-        Button btNext = (Button) retView.findViewById(R.id.btNext);
-        btNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickOnButtonNext(Objects.requireNonNull(fragmentManager));
-            }
-        });
+        Button btNext = retView.findViewById(R.id.btNext);
+        btNext.setOnClickListener(view -> clickOnButtonNext(Objects.requireNonNull(fragmentManager)));
 
-        Button btPrevious = (Button) retView.findViewById(R.id.btPrevious);
-        btPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickOnButtonPrevious(Objects.requireNonNull(fragmentManager));
-            }
-        });
+        Button btPrevious = retView.findViewById(R.id.btPrevious);
+        btPrevious.setOnClickListener(view -> clickOnButtonPrevious(Objects.requireNonNull(fragmentManager)));
 
 
         return retView;

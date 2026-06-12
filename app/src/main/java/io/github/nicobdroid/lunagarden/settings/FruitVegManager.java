@@ -83,7 +83,7 @@ public class FruitVegManager {
         String[] messages = getMessages(context);
         int itemCount = getItemCount(titles, messages);
 
-        ArrayList<VegItem> list = new ArrayList<VegItem>();
+        ArrayList<VegItem> list = new ArrayList<>();
         FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(context);
         for (int i = 0; i < itemCount; i++) {
             VegItem item = new VegItem();
@@ -220,19 +220,11 @@ public class FruitVegManager {
     }
 
     private static boolean isTimeToSow(int i, int month) {
-        boolean result = false;
-        if (semis[i][month]) {
-            result = true;
-        }
-        return result;
+        return semis[i][month];
     }
 
     private static boolean isTimeToCollect(int i, int month) {
-        boolean result = false;
-        if (recoltes[i][month]) {
-            result = true;
-        }
-        return result;
+        return recoltes[i][month];
     }
 
     private static String[] getTitles(Context context) {
@@ -253,9 +245,6 @@ public class FruitVegManager {
 
     private static int getItemCount(String[]... arrays) {
         int expected = ITEM_KEYS.length;
-        if (pictures.length != expected || semis.length != expected || recoltes.length != expected) {
-            throw new IllegalStateException("FruitVegManager configuration is inconsistent.");
-        }
 
         for (String[] array : arrays) {
             if (array.length != expected) {

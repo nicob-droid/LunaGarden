@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -161,25 +160,19 @@ public class FragmentCalendar extends Fragment {
 
         setListView();
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d(TAG, "onItemClick: " + i);
+        listView.setOnItemClickListener((adapterView, view1, i, l) -> {
+            Log.d(TAG, "onItemClick: " + i);
 
-                if (!mActionArray.get(i).isEmpty()) {
-                    Intent intent = new Intent(getContext(), ActivityDay.class);
-                    String date = mDateStringArray.get(i) + " " + String.valueOf(mYearId);
-                    intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_DATE, date);
-                    intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_MOON, mMoonArray.get(i));
+            if (!mActionArray.get(i).isEmpty()) {
+                Intent intent = new Intent(getContext(), ActivityDay.class);
+                String date = mDateStringArray.get(i) + " " + mYearId;
+                intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_DATE, date);
+                intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_MOON, mMoonArray.get(i));
 
-                    computeResultDayAction(mYearId, i);
-                    intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_LIST_SOW, mResultArray);
+                computeResultDayAction(mYearId, i);
+                intent.putExtra(AppTechnicalKeys.ACTIVITY_EXTRA_LIST_SOW, mResultArray);
 
-                    //TODO
-
-
-                    startActivity(intent);
-                }
+                startActivity(intent);
             }
         });
 
@@ -197,26 +190,22 @@ public class FragmentCalendar extends Fragment {
             @Override
             public void run() {
                 // code runs in a thread
-                hostActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mainLayout.setVisibility(View.GONE);
-                        pleaseWait.setVisibility(View.VISIBLE);
-                    }
+                hostActivity.runOnUiThread(() -> {
+                    mainLayout.setVisibility(View.GONE);
+                    pleaseWait.setVisibility(View.VISIBLE);
                 });
 
                 final SimpleDateFormat curFormater = new SimpleDateFormat("MMM dd");
-//        DateFormat curFormater = DateFormat.getDateInstance(DateFormat.FULL);
                 final GregorianCalendar date = new GregorianCalendar();
-//        String[] dateStringArray = new String[date.getActualMaximum(Calendar.DAY_OF_MONTH) + 1];
 
-                mDateStringArray = new ArrayList<String>();
-                mMoonArray = new ArrayList<Integer>();
-                mSowArray = new ArrayList<Integer>();
-                mCollectArray = new ArrayList<Integer>();
-                mActionArray = new ArrayList<String>();
 
-                mResultArray = new ArrayList<ResultVegItem>();
+                mDateStringArray = new ArrayList<>();
+                mMoonArray = new ArrayList<>();
+                mSowArray = new ArrayList<>();
+                mCollectArray = new ArrayList<>();
+                mActionArray = new ArrayList<>();
+
+                mResultArray = new ArrayList<>();
                 final MonthVegCache monthVegCache = new MonthVegCache(safeContext, mMonthId);
 
                 date.set(Calendar.YEAR, mYearId);
@@ -246,30 +235,27 @@ public class FragmentCalendar extends Fragment {
                 }
 
                 // code runs in a thread
-                hostActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!isAdded()) {
-                            return;
-                        }
-                        calendarAdapter = new CalendarAdapter(getContext(), mDateStringArray,
-                                mMoonArray, mSowArray, mCollectArray, mActionArray);
-                        listView.setAdapter(calendarAdapter);
-                 //       listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-
-
-                        if ((actualMonth == mMonthId) && (actualYear == mYearId)) {
-                            listView.setSelection(actualDay - 1);
-                            listView.setItemChecked(actualDay - 1, true);
-                        }
-
-
-                        mainLayout.setVisibility(View.VISIBLE);
-                        pleaseWait.setVisibility(View.GONE);
-
-
-
+                hostActivity.runOnUiThread(() -> {
+                    if (!isAdded()) {
+                        return;
                     }
+                    calendarAdapter = new CalendarAdapter(getContext(), mDateStringArray,
+                            mMoonArray, mSowArray, mCollectArray, mActionArray);
+                    listView.setAdapter(calendarAdapter);
+             //       listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+
+                    if ((actualMonth == mMonthId) && (actualYear == mYearId)) {
+                        listView.setSelection(actualDay - 1);
+                        listView.setItemChecked(actualDay - 1, true);
+                    }
+
+
+                    mainLayout.setVisibility(View.VISIBLE);
+                    pleaseWait.setVisibility(View.GONE);
+
+
+
                 });
 
             }
@@ -338,7 +324,7 @@ public class FragmentCalendar extends Fragment {
         mActionArray.add(monthVegCache.getActionForDayKind(computation.dayKind));
     }
 
-    private final class MonthVegCache {
+    private static final class MonthVegCache {
         private final Context context;
         private final int rootSowIcon;
         private final int rootCollectIcon;
@@ -465,66 +451,6 @@ public class FragmentCalendar extends Fragment {
         }
     }
 
-    private void computeCollectArray(GregorianCalendar date, int day) {
-        if (isAscendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mCollectArray.add(R.drawable.ic_cancel);
-        } else if (isDescendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mCollectArray.add(R.drawable.ic_cancel);
-        } else if (isApogee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mCollectArray.add(R.drawable.ic_apogee);
-        } else if (isPerigee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mCollectArray.add(R.drawable.ic_perigee);
-        } else if (isDayRacine(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addRootVegForCollectOnScreen(mMonthId);
-        } else if (isDayFeuille(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addLeafVegForCollectOnScreen(mMonthId);
-        } else if (isDayFruit(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addFruitVegForCollectOnScreen(mMonthId);
-        } else {
-            mCollectArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void computeSowArray(GregorianCalendar date, int day) {
-        if (isAscendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mSowArray.add(R.drawable.ic_cancel);
-        } else if (isDescendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mSowArray.add(R.drawable.ic_cancel);
-        } else if (isApogee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mSowArray.add(R.drawable.ic_apogee);
-        } else if (isPerigee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mSowArray.add(R.drawable.ic_perigee);
-        } else if (isDayRacine(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addRootVegForSowOnScreen(mMonthId);
-        } else if (isDayFeuille(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addLeafVegForSowOnScreen(mMonthId);
-        } else if (isDayFruit(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addFruitVegForSowOnScreen(mMonthId);
-        } else {
-            mSowArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void computeActionArray(GregorianCalendar date, int day) {
-        if (isAscendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mActionArray.add(getString(R.string.ascending_moon_node));
-        } else if (isDescendingMoonNode(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mActionArray.add(getString(R.string.descending_moon_node));
-        } else if (isApogee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mActionArray.add(getString(R.string.moon_apogee));
-        } else if (isPerigee(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            mActionArray.add(getString(R.string.moon_perigee));
-        } else if (isDayRacine(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addRootVegAction(mMonthId);
-        } else if (isDayFeuille(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addLeafVegAction(mMonthId);
-        } else if (isDayFruit(date.get(Calendar.YEAR), mMonthId + 1, day + 1)) {
-            addFruitVegAction(mMonthId);
-        } else {
-            mActionArray.add("");
-        }
-    }
-
     private void computeResultDayAction(int year, int day) {
         // Clear array first
         mResultArray.clear();
@@ -571,138 +497,12 @@ public class FragmentCalendar extends Fragment {
         }
     }
 
-    private void addRootVegAction(int month) {
-        String strSow = "";
-        String strCollect = "";
-        String strResult = "";
-        RootVegPrefs rootVegPrefs = new RootVegPrefs(requireContext());
-        if (rootVegPrefs.isRootVegEnabled()) {
-            strSow = RootVegManager.getListForSow(getContext(), month);
-            strCollect = RootVegManager.getListForCollect(getContext(), month);
-            if (!strSow.isEmpty()) {
-                strResult = getString(R.string.action_sow_format, strSow);
-                if (!strCollect.isEmpty()) {
-                    strResult = strResult + "\n" + getString(R.string.action_collect_format, strCollect);
-                }
-            } else if (!strCollect.isEmpty()) {
-                strResult = getString(R.string.action_collect_format, strCollect);
-            }
-
-
-        }
-        mActionArray.add(strResult);
-    }
-
-    private void addRootVegForSowOnScreen(int month) {
-        RootVegPrefs rootVegPrefs = new RootVegPrefs(requireContext());
-        if (rootVegPrefs.isRootVegEnabled()) {
-            mSowArray.add(RootVegManager.getFirstItemEnabledForSow(getContext(), month));
-        } else {
-            mSowArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addRootVegForCollectOnScreen(int month) {
-        RootVegPrefs rootVegPrefs = new RootVegPrefs(requireContext());
-        if (rootVegPrefs.isRootVegEnabled()) {
-            mCollectArray.add(RootVegManager.getFirstItemEnabledForCollect(getContext(), month));
-        } else {
-            mCollectArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addLeafVegForSowOnScreen(int month) {
-        LeafVegPrefs leafVegPrefs = new LeafVegPrefs(requireContext());
-        if (leafVegPrefs.isLeafVegEnabled()) {
-            mSowArray.add(LeafVegManager.getFirstItemEnabledForSow(getContext(), month));
-        } else {
-            mSowArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addLeafVegForCollectOnScreen(int month) {
-        LeafVegPrefs leafVegPrefs = new LeafVegPrefs(requireContext());
-        if (leafVegPrefs.isLeafVegEnabled()) {
-            mCollectArray.add(LeafVegManager.getFirstItemEnabledForCollect(getContext(), month));
-        } else {
-            mCollectArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addLeafVegAction(int month) {
-        String strSow = "";
-        String strCollect = "";
-        String strResult = "";
-        LeafVegPrefs leafVegPrefs = new LeafVegPrefs(requireContext());
-        if (leafVegPrefs.isLeafVegEnabled()) {
-            strSow = LeafVegManager.getListForSow(getContext(), month);
-            strCollect = LeafVegManager.getListForCollect(getContext(), month);
-            if (!strSow.isEmpty()) {
-                strResult = getString(R.string.action_sow_format, strSow);
-                if (!strCollect.isEmpty()) {
-                    strResult = strResult + "\n" + getString(R.string.action_collect_format, strCollect);
-                }
-            } else if (!strCollect.isEmpty()) {
-                strResult = getString(R.string.action_collect_format, strCollect);
-            }
-        }
-
-        //mResultArray = LeafVegManager.getResultVegForSow(getContext(), month);
-        //ArrayList<ResultVegItem> collectArray = LeafVegManager.getResultVegForCollect(getContext(), month);
-        //mResultArray.addAll(collectArray);
-
-        mActionArray.add(strResult);
-    }
-
-    private void addFruitVegForSowOnScreen(int month) {
-        FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(requireContext());
-        if (fruitVegPrefs.isFruitVegEnabled()) {
-            mSowArray.add(FruitVegManager.getFirstItemEnabledForSow(getContext(), month));
-        } else {
-            mSowArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addFruitVegForCollectOnScreen(int month) {
-        FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(requireContext());
-        if (fruitVegPrefs.isFruitVegEnabled()) {
-            mCollectArray.add(FruitVegManager.getFirstItemEnabledForCollect(getContext(), month));
-        } else {
-            mCollectArray.add(R.drawable.ic_nothing);
-        }
-    }
-
-    private void addFruitVegAction(int month) {
-        String strSow = "";
-        String strCollect = "";
-        String strResult = "";
-        FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(requireContext());
-        if (fruitVegPrefs.isFruitVegEnabled()) {
-            strSow = FruitVegManager.getListForSow(getContext(), month);
-            strCollect = FruitVegManager.getListForCollect(getContext(), month);
-            if (!strSow.isEmpty()) {
-                strResult = getString(R.string.action_sow_format, strSow);
-                if (!strCollect.isEmpty()) {
-                    strResult = strResult + "\n" + getString(R.string.action_collect_format, strCollect);
-                }
-            } else if (!strCollect.isEmpty()) {
-                strResult = getString(R.string.action_collect_format, strCollect);
-            }
-        }
-        //mResultArray = FruitVegManager.getResultVegForSow(getContext(), month);
-        //ArrayList<ResultVegItem> collectArray = FruitVegManager.getResultVegForCollect(getContext(), month);
-        //mResultArray.addAll(collectArray);
-
-        mActionArray.add(strResult);
-    }
-
-
     // Computes moon phase based upon Bradley E. Schaefer's moon phase algorithm.
     private double computeMoonPhase(int year, int month, int day) {
         //Log.i(TAG, "computeMoonPhase: year=" + year + " month=" + month + " day=" + day);
 
         // Convert the year into the format expected by the algorithm.
-        double transformedYear = year - Math.floor((12 - month) / 10);
+        double transformedYear = year - Math.floor((double) (12 - month) / 10);
         //Log.i(TAG, "transformedYear: " + transformedYear);
 
         // Convert the month into the format expected by the algorithm.
@@ -860,11 +660,10 @@ public class FragmentCalendar extends Fragment {
 
             DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
             try {
-                Date dateNodeRef1 = (Date) dateFormatNodeRef.parse(strDateRef1);
-                Date newDateRef1 = dateNodeRef1;// = (Date)addTime(dateNodeRef1, nodeType);
+                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
                 for (int i = 0; i < 26; i++) {
 
-                    newDateRef1 = (Date) addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
+                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
                     Calendar calendarRef1 = Calendar.getInstance();
                     calendarRef1.setTime(newDateRef1);
 
@@ -897,7 +696,7 @@ public class FragmentCalendar extends Fragment {
 
 
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error parsing date for day racine reference", e);
             }
         }
         dayRootCache.put(cacheKey, bResult);
@@ -918,11 +717,10 @@ public class FragmentCalendar extends Fragment {
 
             DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
             try {
-                Date dateNodeRef1 = (Date) dateFormatNodeRef.parse(strDateRef1);
-                Date newDateRef1 = dateNodeRef1;// = (Date)addTime(dateNodeRef1, nodeType);
+                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
                 for (int i = 0; i < 26; i++) {
 
-                    newDateRef1 = (Date) addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
+                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
                     Calendar calendarRef1 = Calendar.getInstance();
                     calendarRef1.setTime(newDateRef1);
 
@@ -955,7 +753,7 @@ public class FragmentCalendar extends Fragment {
 
 
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error parsing date for day feuille reference", e);
             }
         }
         dayLeafCache.put(cacheKey, bResult);
@@ -976,11 +774,10 @@ public class FragmentCalendar extends Fragment {
 
             DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
             try {
-                Date dateNodeRef1 = (Date) dateFormatNodeRef.parse(strDateRef1);
-                Date newDateRef1 = dateNodeRef1;// = (Date)addTime(dateNodeRef1, nodeType);
+                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
                 for (int m = 0; m < 26; m++) {
 
-                    newDateRef1 = (Date) addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
+                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
                     Calendar calendarRef1 = Calendar.getInstance();
                     calendarRef1.setTime(newDateRef1);
 
@@ -1013,7 +810,7 @@ public class FragmentCalendar extends Fragment {
 
 
             } catch (ParseException e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error parsing date for day fruit reference", e);
             }
         }
         dayFruitCache.put(cacheKey, bResult);
@@ -1032,10 +829,10 @@ public class FragmentCalendar extends Fragment {
 
         DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy_HH:mm:ss");
         try {
-            Date newDateRef1 = (Date) dateFormatNodeRef.parse(strDateMoonNodeRef1);// = (Date)addTime(dateNodeRef1, nodeType);
+            Date newDateRef1 = dateFormatNodeRef.parse(strDateMoonNodeRef1);// = (Date)addTime(dateNodeRef1, nodeType);
             for (int i = 0; i < 26; i++) {
 
-                newDateRef1 = (Date) addTime(newDateRef1, nodeType);
+                newDateRef1 = addTime(newDateRef1, nodeType);
                 Calendar calendarRef1 = Calendar.getInstance();
                 calendarRef1.setTime(newDateRef1);
 
@@ -1067,7 +864,7 @@ public class FragmentCalendar extends Fragment {
 
 
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error parsing date for moon node reference", e);
         }
 
         moonNodeCache.put(cacheKey, bResult);

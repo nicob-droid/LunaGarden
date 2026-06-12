@@ -10,8 +10,8 @@ import io.github.nicobdroid.lunagarden.R;
 
 public class LeafVegPrefs {
     private static final String TAG = "LeafVegPrefs";
-    private Context mContext;
-    private SharedPreferences mPrefs;
+    private final Context mContext;
+    private final SharedPreferences mPrefs;
 
 
     // constructor

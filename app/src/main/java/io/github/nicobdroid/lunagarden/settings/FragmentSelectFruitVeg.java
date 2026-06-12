@@ -1,18 +1,14 @@
 package io.github.nicobdroid.lunagarden.settings;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -58,21 +54,11 @@ public class FragmentSelectFruitVeg extends Fragment {
 
 
 
-        Button btNext = (Button) retView.findViewById(R.id.btNext);
-        btNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickOnButtonNext(Objects.requireNonNull(fragmentManager));
-            }
-        });
+        Button btNext = retView.findViewById(R.id.btNext);
+        btNext.setOnClickListener(view -> clickOnButtonNext(Objects.requireNonNull(fragmentManager)));
 
-        Button btPrevious = (Button) retView.findViewById(R.id.btPrevious);
-        btPrevious.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickOnButtonPrevious(Objects.requireNonNull(fragmentManager));
-            }
-        });
+        Button btPrevious = retView.findViewById(R.id.btPrevious);
+        btPrevious.setOnClickListener(view -> clickOnButtonPrevious(Objects.requireNonNull(fragmentManager)));
 
         return retView;
     }
@@ -81,16 +67,10 @@ public class FragmentSelectFruitVeg extends Fragment {
 
 
         // Setting item click listener
-        mFruitListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> adpView, View view,
-                                    int position, long itemId) {
-                Log.d("TEST", "onItemClick");
-                if (mFruitListAdapter != null) {
-                    VegItem item = mFruitListAdapter.getItem(position);
-
-                }
+        mFruitListview.setOnItemClickListener((adpView, view, position, itemId) -> {
+            Log.d("TEST", "onItemClick");
+            if (mFruitListAdapter != null) {
+                VegItem item = mFruitListAdapter.getItem(position);
             }
         });
 
@@ -100,19 +80,19 @@ public class FragmentSelectFruitVeg extends Fragment {
     /**
      * The listener to get list item click events.
      */
-    private VegListAdapter.OnFruitItemClickListener listListener = new VegListAdapter.OnFruitItemClickListener() {
+    private final VegListAdapter.OnFruitItemClickListener listListener = new VegListAdapter.OnFruitItemClickListener() {
 
         @Override
         public void onCheckboxClicked(int position, VegItem item) {
             item.setCheckboxChecked(!item.isCheckboxChecked());
-            Log.d(TAG, "onCheckboxClicked: " + item.getFruitname() + " is " + String.valueOf(item.isCheckboxChecked()));
+            Log.d(TAG, "onCheckboxClicked: " + item.getFruitname() + " is " + item.isCheckboxChecked());
             mFruitListAdapter.notifyDataSetChanged();
         }
 
     };
 
     private void populateFruitList(ArrayList<VegItem> list) {
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             if (mFruitListAdapter == null) {
                 mFruitListAdapter = new VegListAdapter(mContext, mFruitList);
                 mFruitListAdapter.setOnFruitClickListener(listListener);

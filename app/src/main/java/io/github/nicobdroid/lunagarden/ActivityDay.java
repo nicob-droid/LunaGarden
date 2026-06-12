@@ -3,6 +3,7 @@ import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,6 +17,7 @@ import java.util.Objects;
 
 
 public class ActivityDay extends AppCompatActivity {
+    private static final String TAG = "ActivityDay";
     // The FruitList Adapter to bind the views and show in listview.
     private ResultVegListAdapter mListAdapter;
     // The ArrayList of Fruits<FruitItem>.
@@ -42,7 +44,7 @@ public class ActivityDay extends AppCompatActivity {
             format = new SimpleDateFormat("dd MMMM yyyy");
             strCurrentDate = format.format(newDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error parsing date: " + strCurrentDate, e);
         }
         // set date and moon view as title
         TextView title = findViewById(R.id.title);
@@ -56,7 +58,7 @@ public class ActivityDay extends AppCompatActivity {
     }
 
     private void populateFruitList(ArrayList<ResultVegItem> list) {
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             if (mListAdapter == null) {
                 mListAdapter = new ResultVegListAdapter(getApplicationContext(), mFruitList);
             }

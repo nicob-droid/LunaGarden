@@ -8,12 +8,11 @@ import java.util.Objects;
 
 public class SaveMoonInfo {
     public static final String TAG = "SaveMoonInfo";
-    private final Context mContext;
     private final SharedPreferences mPrefs;
 
     // constructor
     public SaveMoonInfo(Context context) {
-        this.mContext = Objects.requireNonNull(context, "Context must not be null").getApplicationContext();
+        Context mContext = Objects.requireNonNull(context, "Context must not be null").getApplicationContext();
         this.mPrefs = mContext.getSharedPreferences(
                 AppTechnicalKeys.SHARED_PREF_MOON_INFO,
                 Context.MODE_PRIVATE

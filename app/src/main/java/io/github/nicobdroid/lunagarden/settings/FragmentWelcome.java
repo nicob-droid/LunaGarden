@@ -2,7 +2,6 @@ package io.github.nicobdroid.lunagarden.settings;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import androidx.annotation.NonNull;
@@ -10,12 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import java.util.Objects;
+
 
 import io.github.nicobdroid.lunagarden.R;
 
@@ -30,13 +24,8 @@ public class FragmentWelcome extends Fragment {
 
 
 
-        Button btNext = (Button)retView.findViewById(R.id.btNext);
-        btNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clickOnButtonNext(fragmentManager);
-            }
-        });
+        Button btNext = retView.findViewById(R.id.btNext);
+        btNext.setOnClickListener(view -> clickOnButtonNext(fragmentManager));
 
         return retView;
     }

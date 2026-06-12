@@ -6,6 +6,8 @@ import android.widget.NumberPicker;
 
 import androidx.preference.PreferenceDialogFragmentCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 public class NumberPickerPreferenceDialogFragmentCompat extends PreferenceDialogFragmentCompat {
     private NumberPicker numberPicker;
 
@@ -18,7 +20,7 @@ public class NumberPickerPreferenceDialogFragmentCompat extends PreferenceDialog
     }
 
     @Override
-    protected View onCreateDialogView(android.content.Context context) {
+    protected View onCreateDialogView(@NotNull android.content.Context context) {
         numberPicker = new NumberPicker(context);
         NumberPickerPreference preference = (NumberPickerPreference) getPreference();
         numberPicker.setMinValue(preference.getMinDays());
@@ -28,7 +30,7 @@ public class NumberPickerPreferenceDialogFragmentCompat extends PreferenceDialog
     }
 
     @Override
-    protected void onBindDialogView(View view) {
+    protected void onBindDialogView(@NotNull View view) {
         super.onBindDialogView(view);
         NumberPickerPreference preference = (NumberPickerPreference) getPreference();
         numberPicker.setValue(preference.getCurrentDays());

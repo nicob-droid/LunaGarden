@@ -59,10 +59,6 @@ public class NumberPickerPreference extends DialogPreference {
                 days));
     }
 
-    private int readPersistedDays() {
-        return parseAndClampDays(getPersistedString(String.valueOf(MIN_DAYS)));
-    }
-
     private void setDaysInternal(int days) {
         currentDays = days;
         updateSummary(days);

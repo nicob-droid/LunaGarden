@@ -1,7 +1,6 @@
 package io.github.nicobdroid.lunagarden.settings;
+
 import android.util.Log;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import java.util.List;
@@ -18,20 +17,16 @@ public class FragmentUtil {
         // Get all Fragment list.
         List<Fragment> fragmentList = fragmentManager.getFragments();
 
-        if(fragmentList!=null)
-        {
-            int size = fragmentList.size();
-            for(int i=0;i<size;i++)
-            {
-                Fragment fragment = fragmentList.get(i);
+        int size = fragmentList.size();
+        for(int i=0;i<size;i++) {
+            Fragment fragment = fragmentList.get(i);
 
-                if(fragment!=null) {
-                    String fragmentTag = fragment.getTag();
+            if(fragment!=null) {
+                String fragmentTag = fragment.getTag();
 
-                    // If Fragment tag name is equal then return it.
-                    if (fragmentTag.equals(fragmentTagName)) {
-                        ret = fragment;
-                    }
+                // If Fragment tag name is equal then return it.
+                if (fragmentTag != null && fragmentTag.equals(fragmentTagName)) {
+                    ret = fragment;
                 }
             }
         }
@@ -45,21 +40,20 @@ public class FragmentUtil {
         // Get all Fragment list.
         List<Fragment> fragmentList = fragmentManager.getFragments();
 
-        if(fragmentList!=null)
+        int size = fragmentList.size();
+        for(int i=0;i<size;i++)
         {
-            int size = fragmentList.size();
-            for(int i=0;i<size;i++)
-            {
-                Fragment fragment = fragmentList.get(i);
+            Fragment fragment = fragmentList.get(i);
 
-                if(fragment!=null) {
-                    String fragmentTag = fragment.getTag();
+            if(fragment!=null) {
+                String fragmentTag = fragment.getTag();
+                if (fragmentTag != null) {
                     Log.d(TAG_NAME_FRAGMENT, fragmentTag);
                 }
             }
-
-            Log.d(TAG_NAME_FRAGMENT, "***********************************");
         }
+
+        Log.d(TAG_NAME_FRAGMENT, "***********************************");
     }
 }
 

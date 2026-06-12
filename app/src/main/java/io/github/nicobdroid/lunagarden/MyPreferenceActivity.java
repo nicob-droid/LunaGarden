@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MyPreferenceActivity extends AppCompatActivity {
     private static final String TAG = "MyPreferenceActivity";
     private static final String DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG";
@@ -59,30 +61,27 @@ public class MyPreferenceActivity extends AppCompatActivity {
                 return;
             }
 
-            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference changedPreference, Object newValue) {
-                    if (getContext() == null) {
-                        return true;
-                    }
-
-                    if (getString(R.string.settings_notification_enable).equals(changedPreference.getKey())
-                            && newValue instanceof Boolean
-                            && !((Boolean) newValue)) {
-                        NotificationJobService.cancelScheduledJob(getContext());
-                    } else {
-                        NotificationJobService.scheduleNextJob(getContext());
-                    }
-
-                    Log.d(TAG, "Notification preference updated: " + changedPreference.getKey());
+            preference.setOnPreferenceChangeListener((changedPreference, newValue) -> {
+                if (getContext() == null) {
                     return true;
                 }
+
+                if (getString(R.string.settings_notification_enable).equals(changedPreference.getKey())
+                        && newValue instanceof Boolean
+                        && !((Boolean) newValue)) {
+                    NotificationJobService.cancelScheduledJob(getContext());
+                } else {
+                    NotificationJobService.scheduleNextJob(getContext());
+                }
+
+                Log.d(TAG, "Notification preference updated: " + changedPreference.getKey());
+                return true;
             });
 
         }
 
         @Override
-        public void onDisplayPreferenceDialog(Preference preference) {
+        public void onDisplayPreferenceDialog(@NotNull Preference preference) {
             DialogFragment dialogFragment;
             if (preference instanceof TimePreference) {
                 dialogFragment = TimePreferenceDialogFragmentCompat.newInstance(preference.getKey());

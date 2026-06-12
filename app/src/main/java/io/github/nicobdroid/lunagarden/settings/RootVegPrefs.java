@@ -9,8 +9,8 @@ import io.github.nicobdroid.lunagarden.R;
 
 public class RootVegPrefs {
     public static final String TAG = "RootVegPrefs";
-    private Context mContext;
-    private SharedPreferences mPrefs;
+    private final Context mContext;
+    private final SharedPreferences mPrefs;
 
 
     // constructor
@@ -48,15 +48,6 @@ public class RootVegPrefs {
             return getSharedPreferenceString(itemKey, mContext.getString(R.string.default_root_veg_item));
         }
         return readItemEnable(legacyItemName);
-    }
-
-    public boolean isItemEnabled(String itemName) {
-        boolean bResult = true;
-        String str = readItemEnable(itemName);
-        if (str.contains("false")) {
-            bResult = false;
-        }
-        return bResult;
     }
 
     public boolean isItemEnabled(String itemKey, String legacyItemName) {

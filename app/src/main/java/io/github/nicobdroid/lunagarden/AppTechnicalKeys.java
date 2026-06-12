@@ -101,13 +101,7 @@ public final class AppTechnicalKeys {
     public static final String ACTIVITY_EXTRA_DATE = "activity_extra_date";
     public static final String ACTIVITY_EXTRA_MOON = "activity_extra_moon";
     public static final String ACTIVITY_EXTRA_LIST_SOW = "activity_extra_list_sow";
-
-    public static final String NOTIFICATION_EXTRA_TITLE = "notification_extra_title";
-    public static final String NOTIFICATION_EXTRA_MESSAGE = "notification_extra_message";
-
     public static final String PREF_VALUE_YES = "Yes";
     public static final String PREF_VALUE_NO = "No";
-
-    public static final String ADMOB_APP_ID = "ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy";
 }
 
