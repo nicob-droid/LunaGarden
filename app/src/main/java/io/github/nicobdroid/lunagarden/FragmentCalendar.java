@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
 import io.github.nicobdroid.lunagarden.settings.FruitVegPrefs;
@@ -48,6 +50,16 @@ public class FragmentCalendar extends Fragment {
     private static final int MOON_NODE_DESCENDING_NODE = 1;
     private static final int MOON_NODE_APOGEE = 2;
     private static final int MOON_NODE_PERIGEE = 3;
+    private static final int DAY_KIND_NONE = 0;
+    private static final int DAY_KIND_ROOT = 1;
+    private static final int DAY_KIND_LEAF = 2;
+    private static final int DAY_KIND_FRUIT = 3;
+
+    private static final int SPECIAL_NONE = 0;
+    private static final int SPECIAL_ASCENDING = 1;
+    private static final int SPECIAL_DESCENDING = 2;
+    private static final int SPECIAL_APOGEE = 3;
+    private static final int SPECIAL_PERIGEE = 4;
 
     private ArrayList<String> mDateStringArray;
     private ArrayList<Integer> mMoonArray;
@@ -63,6 +75,15 @@ public class FragmentCalendar extends Fragment {
     private static int actualYear;
     private static int actualMonth;
     private static int actualDay;
+    private final Map<Integer, Boolean> dayRootCache = new HashMap<>();
+    private final Map<Integer, Boolean> dayLeafCache = new HashMap<>();
+    private final Map<Integer, Boolean> dayFruitCache = new HashMap<>();
+    private final Map<Long, Boolean> moonNodeCache = new HashMap<>();
+
+    private static final class DayComputation {
+        int specialType = SPECIAL_NONE;
+        int dayKind = DAY_KIND_NONE;
+    }
 
     public static FragmentCalendar newInstance(int monthId, int yearId) {
         FragmentCalendar fragment = new FragmentCalendar();
@@ -88,6 +109,8 @@ public class FragmentCalendar extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        clearComputationCaches();
+
         actualYear = Calendar.getInstance().get(Calendar.YEAR);
         actualMonth = Calendar.getInstance().get(Calendar.MONTH);
         actualDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -95,6 +118,21 @@ public class FragmentCalendar extends Fragment {
         Bundle args = requireArguments();
         mMonthId = args.getInt("month", 0);
         mYearId = args.getInt("year", 2018);
+    }
+
+    private void clearComputationCaches() {
+        dayRootCache.clear();
+        dayLeafCache.clear();
+        dayFruitCache.clear();
+        moonNodeCache.clear();
+    }
+
+    private static int dayKey(int year, int month, int day) {
+        return year * 10_000 + month * 100 + day;
+    }
+
+    private static long moonNodeKey(int nodeType, int year, int month, int day) {
+        return (((long) nodeType) << 32) | (dayKey(year, month, day) & 0xFFFFFFFFL);
     }
 
     @Override
@@ -149,11 +187,17 @@ public class FragmentCalendar extends Fragment {
     }
 
     private void setListView() {
+        final Context safeContext = getSafeContext();
+        final FragmentActivity hostActivity = mActivity != null ? mActivity : getActivity();
+        if (hostActivity == null) {
+            return;
+        }
+
         new Thread() {
             @Override
             public void run() {
                 // code runs in a thread
-                requireActivity().runOnUiThread(new Runnable() {
+                hostActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         mainLayout.setVisibility(View.GONE);
@@ -173,6 +217,7 @@ public class FragmentCalendar extends Fragment {
                 mActionArray = new ArrayList<String>();
 
                 mResultArray = new ArrayList<ResultVegItem>();
+                final MonthVegCache monthVegCache = new MonthVegCache(safeContext, mMonthId);
 
                 date.set(Calendar.YEAR, mYearId);
                 date.set(Calendar.MONTH, mMonthId);
@@ -190,19 +235,23 @@ public class FragmentCalendar extends Fragment {
 
                     mMoonArray.add(IMAGE_LOOKUP[phaseValue]);
 
-                    computeSowArray(date, day);
+                    DayComputation dayComputation = computeDayComputation(
+                            date.get(Calendar.YEAR),
+                            mMonthId + 1,
+                            day + 1
+                    );
+                    appendDayVisualData(dayComputation, monthVegCache);
 
-                    computeCollectArray(date, day);
-
-                    computeActionArray(date, day);
-
-                    date.roll(Calendar.DAY_OF_YEAR, true);
+                    date.add(Calendar.DAY_OF_MONTH, 1);
                 }
 
                 // code runs in a thread
-                requireActivity().runOnUiThread(new Runnable() {
+                hostActivity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        if (!isAdded()) {
+                            return;
+                        }
                         calendarAdapter = new CalendarAdapter(getContext(), mDateStringArray,
                                 mMoonArray, mSowArray, mCollectArray, mActionArray);
                         listView.setAdapter(calendarAdapter);
@@ -225,6 +274,195 @@ public class FragmentCalendar extends Fragment {
 
             }
         }.start();
+    }
+
+    private DayComputation computeDayComputation(int year, int month, int day) {
+        DayComputation computation = new DayComputation();
+
+        if (isAscendingMoonNode(year, month, day)) {
+            computation.specialType = SPECIAL_ASCENDING;
+            return computation;
+        }
+        if (isDescendingMoonNode(year, month, day)) {
+            computation.specialType = SPECIAL_DESCENDING;
+            return computation;
+        }
+        if (isApogee(year, month, day)) {
+            computation.specialType = SPECIAL_APOGEE;
+            return computation;
+        }
+        if (isPerigee(year, month, day)) {
+            computation.specialType = SPECIAL_PERIGEE;
+            return computation;
+        }
+
+        if (isDayRacine(year, month, day)) {
+            computation.dayKind = DAY_KIND_ROOT;
+        } else if (isDayFeuille(year, month, day)) {
+            computation.dayKind = DAY_KIND_LEAF;
+        } else if (isDayFruit(year, month, day)) {
+            computation.dayKind = DAY_KIND_FRUIT;
+        }
+
+        return computation;
+    }
+
+    private void appendDayVisualData(DayComputation computation, MonthVegCache monthVegCache) {
+        switch (computation.specialType) {
+            case SPECIAL_ASCENDING:
+                mSowArray.add(R.drawable.ic_cancel);
+                mCollectArray.add(R.drawable.ic_cancel);
+                mActionArray.add(monthVegCache.getSpecialActionText(SPECIAL_ASCENDING));
+                return;
+            case SPECIAL_DESCENDING:
+                mSowArray.add(R.drawable.ic_cancel);
+                mCollectArray.add(R.drawable.ic_cancel);
+                mActionArray.add(monthVegCache.getSpecialActionText(SPECIAL_DESCENDING));
+                return;
+            case SPECIAL_APOGEE:
+                mSowArray.add(R.drawable.ic_apogee);
+                mCollectArray.add(R.drawable.ic_apogee);
+                mActionArray.add(monthVegCache.getSpecialActionText(SPECIAL_APOGEE));
+                return;
+            case SPECIAL_PERIGEE:
+                mSowArray.add(R.drawable.ic_perigee);
+                mCollectArray.add(R.drawable.ic_perigee);
+                mActionArray.add(monthVegCache.getSpecialActionText(SPECIAL_PERIGEE));
+                return;
+            default:
+                break;
+        }
+
+        mSowArray.add(monthVegCache.getSowIconForDayKind(computation.dayKind));
+        mCollectArray.add(monthVegCache.getCollectIconForDayKind(computation.dayKind));
+        mActionArray.add(monthVegCache.getActionForDayKind(computation.dayKind));
+    }
+
+    private final class MonthVegCache {
+        private final Context context;
+        private final int rootSowIcon;
+        private final int rootCollectIcon;
+        private final int leafSowIcon;
+        private final int leafCollectIcon;
+        private final int fruitSowIcon;
+        private final int fruitCollectIcon;
+
+        private final String rootSow;
+        private final String rootCollect;
+        private final String leafSow;
+        private final String leafCollect;
+        private final String fruitSow;
+        private final String fruitCollect;
+
+        MonthVegCache(Context context, int month) {
+            this.context = context;
+            RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
+            if (rootVegPrefs.isRootVegEnabled()) {
+                rootSowIcon = RootVegManager.getFirstItemEnabledForSow(context, month);
+                rootCollectIcon = RootVegManager.getFirstItemEnabledForCollect(context, month);
+                rootSow = RootVegManager.getListForSow(context, month);
+                rootCollect = RootVegManager.getListForCollect(context, month);
+            } else {
+                rootSowIcon = R.drawable.ic_nothing;
+                rootCollectIcon = R.drawable.ic_nothing;
+                rootSow = "";
+                rootCollect = "";
+            }
+
+            LeafVegPrefs leafVegPrefs = new LeafVegPrefs(context);
+            if (leafVegPrefs.isLeafVegEnabled()) {
+                leafSowIcon = LeafVegManager.getFirstItemEnabledForSow(context, month);
+                leafCollectIcon = LeafVegManager.getFirstItemEnabledForCollect(context, month);
+                leafSow = LeafVegManager.getListForSow(context, month);
+                leafCollect = LeafVegManager.getListForCollect(context, month);
+            } else {
+                leafSowIcon = R.drawable.ic_nothing;
+                leafCollectIcon = R.drawable.ic_nothing;
+                leafSow = "";
+                leafCollect = "";
+            }
+
+            FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(context);
+            if (fruitVegPrefs.isFruitVegEnabled()) {
+                fruitSowIcon = FruitVegManager.getFirstItemEnabledForSow(context, month);
+                fruitCollectIcon = FruitVegManager.getFirstItemEnabledForCollect(context, month);
+                fruitSow = FruitVegManager.getListForSow(context, month);
+                fruitCollect = FruitVegManager.getListForCollect(context, month);
+            } else {
+                fruitSowIcon = R.drawable.ic_nothing;
+                fruitCollectIcon = R.drawable.ic_nothing;
+                fruitSow = "";
+                fruitCollect = "";
+            }
+        }
+
+        String getSpecialActionText(int specialType) {
+            switch (specialType) {
+                case SPECIAL_ASCENDING:
+                    return context.getString(R.string.ascending_moon_node);
+                case SPECIAL_DESCENDING:
+                    return context.getString(R.string.descending_moon_node);
+                case SPECIAL_APOGEE:
+                    return context.getString(R.string.moon_apogee);
+                case SPECIAL_PERIGEE:
+                    return context.getString(R.string.moon_perigee);
+                default:
+                    return "";
+            }
+        }
+
+        int getSowIconForDayKind(int dayKind) {
+            switch (dayKind) {
+                case DAY_KIND_ROOT:
+                    return rootSowIcon;
+                case DAY_KIND_LEAF:
+                    return leafSowIcon;
+                case DAY_KIND_FRUIT:
+                    return fruitSowIcon;
+                default:
+                    return R.drawable.ic_nothing;
+            }
+        }
+
+        int getCollectIconForDayKind(int dayKind) {
+            switch (dayKind) {
+                case DAY_KIND_ROOT:
+                    return rootCollectIcon;
+                case DAY_KIND_LEAF:
+                    return leafCollectIcon;
+                case DAY_KIND_FRUIT:
+                    return fruitCollectIcon;
+                default:
+                    return R.drawable.ic_nothing;
+            }
+        }
+
+        String getActionForDayKind(int dayKind) {
+            switch (dayKind) {
+                case DAY_KIND_ROOT:
+                    return formatAction(rootSow, rootCollect);
+                case DAY_KIND_LEAF:
+                    return formatAction(leafSow, leafCollect);
+                case DAY_KIND_FRUIT:
+                    return formatAction(fruitSow, fruitCollect);
+                default:
+                    return "";
+            }
+        }
+
+        private String formatAction(String sow, String collect) {
+            if (!sow.isEmpty()) {
+                String result = context.getString(R.string.action_sow_format, sow);
+                if (!collect.isEmpty()) {
+                    result = result + "\n" + context.getString(R.string.action_collect_format, collect);
+                }
+                return result;
+            }
+            if (!collect.isEmpty()) {
+                return context.getString(R.string.action_collect_format, collect);
+            }
+            return "";
+        }
     }
 
     private void computeCollectArray(GregorianCalendar date, int day) {
@@ -609,6 +847,12 @@ public class FragmentCalendar extends Fragment {
     }
 
     public boolean isDayRacine(int year, int month, int day) {
+        int cacheKey = dayKey(year, month, day);
+        Boolean cachedResult = dayRootCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
         boolean bResult = false;
 
         for (int dayRacine = 0; dayRacine < 10; dayRacine++) {
@@ -656,10 +900,17 @@ public class FragmentCalendar extends Fragment {
                 e.printStackTrace();
             }
         }
+        dayRootCache.put(cacheKey, bResult);
         return bResult;
     }
 
     public boolean isDayFeuille(int year, int month, int day) {
+        int cacheKey = dayKey(year, month, day);
+        Boolean cachedResult = dayLeafCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
         boolean bResult = false;
 
         for (int dayFeuille = 0; dayFeuille < 10; dayFeuille++) {
@@ -707,10 +958,17 @@ public class FragmentCalendar extends Fragment {
                 e.printStackTrace();
             }
         }
+        dayLeafCache.put(cacheKey, bResult);
         return bResult;
     }
 
     public boolean isDayFruit(int year, int month, int day) {
+        int cacheKey = dayKey(year, month, day);
+        Boolean cachedResult = dayFruitCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
         boolean bResult = false;
 
         for (int dayFruit = 0; dayFruit < 10; dayFruit++) {
@@ -758,10 +1016,17 @@ public class FragmentCalendar extends Fragment {
                 e.printStackTrace();
             }
         }
+        dayFruitCache.put(cacheKey, bResult);
         return bResult;
     }
 
     private boolean isMoonNode(int nodeType, int year, int month, int day) {
+        long cacheKey = moonNodeKey(nodeType, year, month, day);
+        Boolean cachedResult = moonNodeCache.get(cacheKey);
+        if (cachedResult != null) {
+            return cachedResult;
+        }
+
         boolean bResult = false;
         String strDateMoonNodeRef1 = getLastRefMoonNode(nodeType);
 
@@ -805,6 +1070,7 @@ public class FragmentCalendar extends Fragment {
             e.printStackTrace();
         }
 
+        moonNodeCache.put(cacheKey, bResult);
         return bResult;
     }
 
