@@ -99,7 +99,7 @@
             android:id="@+id/seekBarProgress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/not_set"
+            android:text="@string/job_not_set"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
     </LinearLayout>
 

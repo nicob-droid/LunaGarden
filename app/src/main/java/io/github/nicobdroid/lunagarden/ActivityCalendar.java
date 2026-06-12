@@ -2,18 +2,34 @@ package io.github.nicobdroid.lunagarden;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.AdListener;
+
 import java.util.Calendar;
 
 public class ActivityCalendar extends AppCompatActivity {
+    private static final String TAG = "ActivityCalendar";
+    private static final int MAX_AD_RETRY = 2;
+    private static final long AD_RETRY_DELAY_MS = 1500L;
     FragmentPagerAdapter adapterViewPager;
+    private AdView adView;
+    private int adRetryCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +40,37 @@ public class ActivityCalendar extends AppCompatActivity {
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager(), getApplicationContext());
         vpPager.setAdapter(adapterViewPager);
         vpPager.setCurrentItem(2);
+
+        adView = findViewById(R.id.adView);
+        if (adView != null) {
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdLoaded() {
+                    adRetryCount = 0;
+                    Log.d(TAG, "AdMob banner loaded");
+                }
+
+                @Override
+                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                    Log.w(TAG, "AdMob banner failed: " + loadAdError.getCode() + " / " + loadAdError.getMessage());
+                    if ((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                        Toast.makeText(
+                                ActivityCalendar.this,
+                                "AdMob error " + loadAdError.getCode() + ": " + loadAdError.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+                    if (adRetryCount < MAX_AD_RETRY) {
+                        adRetryCount++;
+                        new Handler(Looper.getMainLooper()).postDelayed(
+                                () -> adView.loadAd(new AdRequest.Builder().build()),
+                                AD_RETRY_DELAY_MS
+                        );
+                    }
+                }
+            });
+            adView.loadAd(new AdRequest.Builder().build());
+        }
 
     }
 
@@ -156,7 +203,26 @@ public class ActivityCalendar extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        if (adView != null) {
+            adView.resume();
+        }
         startJobScheduler();
+    }
+
+    @Override
+    protected void onPause() {
+        if (adView != null) {
+            adView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (adView != null) {
+            adView.destroy();
+        }
+        super.onDestroy();
     }
 
 

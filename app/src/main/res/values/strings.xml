@@ -1,4 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation">
     <string name="app_name">LunaGarden</string>
     <string name="january">Janvier</string>
     <string name="february">Février</string>
@@ -63,7 +64,7 @@
     <string name="legal_privacy_url">file:///android_asset/legal/privacy-fr.html</string>
     <string name="configuration">Configuration</string>
     <string name="reconfiguration_message">Il est possible de reconfigurer les légumes de votre jardin idéal à tout moment.</string>
-    <string name="settings_appearance_mode">settings_appearance_mode</string>
+    <string name="settings_appearance_mode" translatable="false">settings_appearance_mode</string>
     <string name="settings_appearance_title">Mode d\'apparence</string>
     <string name="settings_appearance_summary">Choisir l\'apparence de l\'application</string>
     <string name="notification_time_message">Spécifier l\'heure de notification pour être prévenu d\'une eventuelle action à effectuer dans votre jardin.</string>
@@ -85,7 +86,7 @@
     <string name="device_idle">Appareil inactif</string>
     <string name="device_charging">Appareil en charge</string>
     <string name="override_deadline">Delai maximal :</string>
-    <string name="not_set">Non defini</string>
+    <string name="job_not_set">Non defini</string>
     <string name="schedule_job">Planifier la tache</string>
     <string name="cancel_jobs">Annuler les taches</string>
     <string name="job_service">Service de tache</string>
@@ -107,6 +108,8 @@
     <string name="notification_default_title">LunaGarden</string>
     <string name="notification_default_text">Consultez les actions du jour.</string>
     <string name="notification_debug_post_execute">postExecute</string>
+    <string name="admob_app_id" translatable="false">ca-app-pub-7013455903622493~5180977393</string>
+    <string name="admob_banner_unit_id" translatable="false">ca-app-pub-7013455903622493/4773783280</string>
 
     <string name="a11y_moon_image">Icône de la lune</string>
     <string name="a11y_moon_phase_icon">Phase de lune</string>

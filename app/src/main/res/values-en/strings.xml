@@ -63,6 +63,8 @@
     <string name="legal_privacy_url">file:///android_asset/legal/privacy-en.html</string>
     <string name="configuration">Configuration</string>
     <string name="reconfiguration_message">You can reconfigure your ideal garden vegetables at any time.</string>
+    <string name="settings_appearance_title">Appearance mode</string>
+    <string name="settings_appearance_summary">Choose the app appearance</string>
     <string name="notification_time_message">Set the notification time to be informed of any action to perform in your garden.</string>
     <string name="notification_days_earlier_message">You can receive a notification one or more days in advance to better organize your ideal garden.</string>
     <plurals name="notification_days_earlier_current_value">
@@ -82,7 +84,7 @@
     <string name="device_idle">Device Idle</string>
     <string name="device_charging">Device Charging</string>
     <string name="override_deadline">Override Deadline:</string>
-    <string name="not_set">Not set</string>
+    <string name="job_not_set">Not set</string>
     <string name="schedule_job">Schedule Job</string>
     <string name="cancel_jobs">Cancel Jobs</string>
     <string name="job_service">Job Service</string>
@@ -104,5 +106,17 @@
     <string name="notification_default_title">LunaGarden</string>
     <string name="notification_default_text">Check today\'s actions.</string>
     <string name="notification_debug_post_execute">postExecute</string>
+    <string name="a11y_moon_image">Moon icon</string>
+    <string name="a11y_moon_phase_icon">Moon phase</string>
+    <string name="a11y_sowing_icon">Sowing indicator</string>
+    <string name="a11y_harvest_icon">Harvest indicator</string>
+    <string name="a11y_vegetable_image">Vegetable illustration</string>
+    <string name="a11y_result_image">Action illustration</string>
+    <string name="a11y_moon_phase_for_date">Moon phase for %1$s</string>
+    <string name="a11y_sowing_for_date">Sowing for %1$s</string>
+    <string name="a11y_harvest_for_date">Harvest for %1$s</string>
+    <string name="a11y_moon_for_day">Moon for %1$s</string>
+    <string name="a11y_vegetable_image_named">Illustration of %1$s</string>
+    <string name="a11y_result_image_named">Illustration for %1$s</string>
 
 </resources>
