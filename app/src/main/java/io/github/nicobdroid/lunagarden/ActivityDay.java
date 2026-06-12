@@ -1,15 +1,12 @@
 package io.github.nicobdroid.lunagarden;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatActivity;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,12 +53,7 @@ public class ActivityDay extends AppCompatActivity {
         mFruitList = aListIdSow;// FruitVegManager.getFruitItemList(getContext());
         populateFruitList(mFruitList);
     }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Checks the orientation of the screen
-        manageScreenOrientation();
-    }
+
     private void populateFruitList(ArrayList<ResultVegItem> list) {
         if (list != null && list.size() > 0) {
             if (mListAdapter == null) {

@@ -1,13 +1,11 @@
 package io.github.nicobdroid.lunagarden.settings;
 import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -54,11 +52,6 @@ public class FragmentBackStackActivity extends AppCompatActivity {
         FragmentUtil.printActivityFragmentList(fragmentManager);
     }
 
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        manageScreenOrientation();
-    }
 
     private void manageScreenOrientation() {
         android.view.WindowManager.LayoutParams layoutParams = this.getWindow().getAttributes();

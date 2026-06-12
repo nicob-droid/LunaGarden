@@ -2,6 +2,7 @@ package io.github.nicobdroid.lunagarden.settings;
 
 import android.content.Context;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Random;
 import io.github.nicobdroid.lunagarden.R;
 import io.github.nicobdroid.lunagarden.ResultVegItem;
