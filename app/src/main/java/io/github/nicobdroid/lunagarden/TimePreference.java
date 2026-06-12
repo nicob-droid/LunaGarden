@@ -1,27 +1,33 @@
 package io.github.nicobdroid.lunagarden;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
-import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.TimePicker;
+
+import androidx.preference.DialogPreference;
+
+import java.util.Locale;
 
 public class TimePreference extends DialogPreference {
+    private static final String DEFAULT_TIME = "00:00";
     private int lastHour = 0;
     private int lastMinute = 0;
-    private TimePicker picker = null;
 
     public static int getHour(String time) {
-        String[] pieces=time.split(":");
-
-        return(Integer.parseInt(pieces[0]));
+        try {
+            String[] pieces = time.split(":");
+            return Math.max(0, Math.min(23, Integer.parseInt(pieces[0])));
+        } catch (Exception ignored) {
+            return 0;
+        }
     }
 
     public static int getMinute(String time) {
-        String[] pieces=time.split(":");
-
-        return(Integer.parseInt(pieces[1]));
+        try {
+            String[] pieces = time.split(":");
+            return Math.max(0, Math.min(59, Integer.parseInt(pieces[1])));
+        } catch (Exception ignored) {
+            return 0;
+        }
     }
 
     public TimePreference(Context ctxt, AttributeSet attrs) {
@@ -31,85 +37,41 @@ public class TimePreference extends DialogPreference {
         setNegativeButtonText(R.string.dialog_cancel);
     }
 
-    private void setTime(int hour, int minute) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            picker.setHour(hour);
-            picker.setMinute(minute);
-        } else {
-            picker.setCurrentHour(hour);
-            picker.setCurrentMinute(minute);
-        }
-    }
-
-    private int getHour() {
-        int result = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            result = picker.getHour();
-        } else {
-            result = picker.getCurrentHour();
-        }
-        return result;
-    }
-
-    private int getMinute() {
-        int result = 0;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            result = picker.getMinute();
-        } else {
-            result = picker.getCurrentMinute();
-        }
-        return result;
-    }
-
-    @Override
-    protected View onCreateDialogView() {
-        picker=new TimePicker(getContext());
-        picker.setIs24HourView(true);
-        return(picker);
-    }
-
-    @Override
-    protected void onBindDialogView(View v) {
-        super.onBindDialogView(v);
-
-        setTime(lastHour, lastMinute);
-    }
-
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-
-        if (positiveResult) {
-            lastHour = getHour();
-            lastMinute = getMinute();
-
-            String time = String.valueOf(lastHour) + ":" + String.valueOf(lastMinute);
-
-            if (callChangeListener(time)) {
-                persistString(time);
-            }
-        }
-    }
-
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
         return(a.getString(index));
     }
 
     @Override
-    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        String time = null;
+    protected void onSetInitialValue(Object defaultValue) {
+        String fallback = defaultValue == null ? DEFAULT_TIME : defaultValue.toString();
+        String time = getPersistedString(fallback);
+        setTimeInternal(time);
+    }
 
-        if (restoreValue) {
-            if (defaultValue == null) {
-                time = getPersistedString("00:00");
-            }
-            else {
-                time = getPersistedString(defaultValue.toString());
-            }
+    public int getLastHour() {
+        return lastHour;
+    }
+
+    public int getLastMinute() {
+        return lastMinute;
+    }
+
+    public void saveTime(int hour, int minute) {
+        int clampedHour = Math.max(0, Math.min(23, hour));
+        int clampedMinute = Math.max(0, Math.min(59, minute));
+        String time = String.format(Locale.US, "%02d:%02d", clampedHour, clampedMinute);
+
+        if (callChangeListener(time)) {
+            persistString(time);
+            setTimeInternal(time);
+            notifyChanged();
         }
-        else {
-            time = defaultValue.toString();
+    }
+
+    private void setTimeInternal(String time) {
+        if (time == null || !time.contains(":")) {
+            time = DEFAULT_TIME;
         }
 
         lastHour = getHour(time);

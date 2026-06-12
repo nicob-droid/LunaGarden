@@ -15,10 +15,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 
 import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
 import io.github.nicobdroid.lunagarden.settings.LeafVegManager;

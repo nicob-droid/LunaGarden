@@ -2,19 +2,28 @@ package io.github.nicobdroid.lunagarden;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.view.MenuItem;
-import androidx.appcompat.app.ActionBar;
 
-public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceFragmentCompat;
+
+public class MyPreferenceActivity extends AppCompatActivity {
     private static final String TAG = "MyPreferenceActivity";
+    private static final String DIALOG_FRAGMENT_TAG = "androidx.preference.PreferenceFragment.DIALOG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferenceFragment()).commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(android.R.id.content, new MyPreferenceFragment())
+                    .commit();
+        }
         setTitle(R.string.settings);
 
         ActionBar actionBar = getSupportActionBar();
@@ -32,11 +41,10 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
         return super.onOptionsItemSelected(item);
     }
 
-    public static class MyPreferenceFragment extends PreferenceFragment {
+    public static class MyPreferenceFragment extends PreferenceFragmentCompat {
         @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.preferences);
+        public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+            setPreferencesFromResource(R.xml.preferences, rootKey);
             updateAppVersionSummary();
 
             bindNotificationPreferenceListener(getString(R.string.settings_notification_enable));
@@ -54,16 +62,16 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
             preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference changedPreference, Object newValue) {
-                    if (getActivity() == null) {
+                    if (getContext() == null) {
                         return true;
                     }
 
                     if (getString(R.string.settings_notification_enable).equals(changedPreference.getKey())
                             && newValue instanceof Boolean
                             && !((Boolean) newValue)) {
-                        NotificationJobService.cancelScheduledJob(getActivity());
+                        NotificationJobService.cancelScheduledJob(getContext());
                     } else {
-                        NotificationJobService.scheduleNextJob(getActivity());
+                        NotificationJobService.scheduleNextJob(getContext());
                     }
 
                     Log.d(TAG, "Notification preference updated: " + changedPreference.getKey());
@@ -73,15 +81,35 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
 
         }
 
+        @Override
+        public void onDisplayPreferenceDialog(Preference preference) {
+            DialogFragment dialogFragment;
+            if (preference instanceof TimePreference) {
+                dialogFragment = TimePreferenceDialogFragmentCompat.newInstance(preference.getKey());
+            } else if (preference instanceof NumberPickerPreference) {
+                dialogFragment = NumberPickerPreferenceDialogFragmentCompat.newInstance(preference.getKey());
+            } else {
+                super.onDisplayPreferenceDialog(preference);
+                return;
+            }
+
+            if (getParentFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
+                return;
+            }
+
+            dialogFragment.setTargetFragment(this, 0);
+            dialogFragment.show(getParentFragmentManager(), DIALOG_FRAGMENT_TAG);
+        }
+
         private void updateAppVersionSummary() {
             Preference appVersionPreference = findPreference(getString(R.string.settings_app_version));
-            if (appVersionPreference == null || getActivity() == null) {
+            if (appVersionPreference == null || getContext() == null) {
                 return;
             }
 
             try {
-                PackageManager packageManager = getActivity().getPackageManager();
-                PackageInfo packageInfo = packageManager.getPackageInfo(getActivity().getPackageName(), 0);
+                PackageManager packageManager = getContext().getPackageManager();
+                PackageInfo packageInfo = packageManager.getPackageInfo(getContext().getPackageName(), 0);
                 String versionName = packageInfo.versionName;
                 if (versionName != null && !versionName.isEmpty()) {
                     appVersionPreference.setSummary(versionName);

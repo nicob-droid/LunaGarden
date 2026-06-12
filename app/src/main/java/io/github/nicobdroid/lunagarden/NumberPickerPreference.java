@@ -2,49 +2,18 @@ package io.github.nicobdroid.lunagarden;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.NumberPicker;
+
+import androidx.preference.DialogPreference;
 
 public class NumberPickerPreference extends DialogPreference {
     private static final int MIN_DAYS = 0;
     private static final int MAX_DAYS = 30;
 
-    private NumberPicker numberPicker;
+    private int currentDays = MIN_DAYS;
 
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-    }
-
-    @Override
-    protected View onCreateDialogView() {
-        numberPicker = new NumberPicker(getContext());
-        numberPicker.setMinValue(MIN_DAYS);
-        numberPicker.setMaxValue(MAX_DAYS);
-        numberPicker.setWrapSelectorWheel(false);
-        return numberPicker;
-    }
-
-    @Override
-    protected void onBindDialogView(View view) {
-        super.onBindDialogView(view);
-        numberPicker.setValue(readPersistedDays());
-    }
-
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-        if (!positiveResult || numberPicker == null) {
-            return;
-        }
-
-        int selectedDays = numberPicker.getValue();
-        String newValue = String.valueOf(selectedDays);
-        if (callChangeListener(newValue)) {
-            persistString(newValue);
-            updateSummary(selectedDays);
-        }
     }
 
     @Override
@@ -53,13 +22,34 @@ public class NumberPickerPreference extends DialogPreference {
     }
 
     @Override
-    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        String value = restorePersistedValue
-                ? getPersistedString(String.valueOf(MIN_DAYS))
-                : defaultValue != null ? String.valueOf(defaultValue) : String.valueOf(MIN_DAYS);
+    protected void onSetInitialValue(Object defaultValue) {
+        String fallback = defaultValue != null ? String.valueOf(defaultValue) : String.valueOf(MIN_DAYS);
+        String value = getPersistedString(fallback);
         int days = parseAndClampDays(value);
         persistString(String.valueOf(days));
-        updateSummary(days);
+        setDaysInternal(days);
+    }
+
+    public int getCurrentDays() {
+        return currentDays;
+    }
+
+    public int getMinDays() {
+        return MIN_DAYS;
+    }
+
+    public int getMaxDays() {
+        return MAX_DAYS;
+    }
+
+    public void saveDays(int days) {
+        int clampedDays = parseAndClampDays(String.valueOf(days));
+        String newValue = String.valueOf(clampedDays);
+        if (callChangeListener(newValue)) {
+            persistString(newValue);
+            setDaysInternal(clampedDays);
+            notifyChanged();
+        }
     }
 
     private void updateSummary(int days) {
@@ -71,6 +61,11 @@ public class NumberPickerPreference extends DialogPreference {
 
     private int readPersistedDays() {
         return parseAndClampDays(getPersistedString(String.valueOf(MIN_DAYS)));
+    }
+
+    private void setDaysInternal(int days) {
+        currentDays = days;
+        updateSummary(days);
     }
 
     private int parseAndClampDays(String value) {
