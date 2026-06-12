@@ -42,13 +42,19 @@
             android:name=".LegalDocumentActivity"
             android:configChanges="orientation|screenSize">
         </activity>
-        <activity
-            android:name=".notificationscheduler.NotificationSchedulerActivity"
-            android:configChanges="orientation|screenSize" >
-        </activity>
         <service
             android:name=".NotificationJobService"
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+        <receiver
+            android:name=".NotificationBootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

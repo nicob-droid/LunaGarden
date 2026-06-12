@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.SwitchPreference;
 import android.util.Log;
 import android.view.MenuItem;
 import androidx.appcompat.app.ActionBar;
@@ -41,28 +40,41 @@ public class MyPreferenceActivity extends AppCompatPreferenceActivity  {
             addPreferencesFromResource(R.xml.preferences);
             updateAppVersionSummary();
 
-            final Preference myPref = (Preference) findPreference(getString(R.string.settings_notification_enable));
-            myPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            bindNotificationPreferenceListener(getString(R.string.settings_notification_enable));
+            bindNotificationPreferenceListener(getString(R.string.settings_notification_time));
+            bindNotificationPreferenceListener(getString(R.string.settings_notification_nb_days_earlier));
 
+        }
+
+        private void bindNotificationPreferenceListener(String key) {
+            Preference preference = findPreference(key);
+            if (preference == null) {
+                return;
+            }
+
+            preference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference,
-                                                  Object newValue) {
-                    boolean switched = ((SwitchPreference) preference).isChecked();
-                    boolean update = !switched;
-                    Log.d(TAG, "onPreferenceChange = " + update);
-                    if (!update) {
-                        Log.d(TAG, "onPreferenceChange: Cancel all jobs");
-                        // Cancel all jobs
-                        JobScheduler mJobScheduler = (JobScheduler) getActivity()
-                                .getSystemService(JOB_SCHEDULER_SERVICE);
-
-                        // Cancel all if exist
-                        mJobScheduler.cancelAll();
+                public boolean onPreferenceChange(Preference changedPreference, Object newValue) {
+                    if (getActivity() == null) {
+                        return true;
                     }
 
+                    if (getString(R.string.settings_notification_enable).equals(changedPreference.getKey())
+                            && newValue instanceof Boolean
+                            && !((Boolean) newValue)) {
+                        JobScheduler mJobScheduler = (JobScheduler) getActivity()
+                                .getSystemService(JOB_SCHEDULER_SERVICE);
+                        if (mJobScheduler != null) {
+                            mJobScheduler.cancelAll();
+                        }
+                        NotificationJobService.cancelScheduledJob(getActivity());
+                    } else {
+                        NotificationJobService.scheduleNextJob(getActivity());
+                    }
+
+                    Log.d(TAG, "Notification preference updated: " + changedPreference.getKey());
                     return true;
                 }
-
             });
 
         }

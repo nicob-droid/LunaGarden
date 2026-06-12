@@ -15,13 +15,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
-import io.github.nicobdroid.lunagarden.notificationscheduler.NotificationSchedulerActivity;
 import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
 import io.github.nicobdroid.lunagarden.settings.LeafVegManager;
 import io.github.nicobdroid.lunagarden.settings.RootVegManager;
@@ -32,45 +30,199 @@ import java.util.Date;
 
 public class NotificationJobService extends JobService {
     private static final String TAG = "NotificationJobService";
+    private static final int JOB_ID = 52;
+    private static final int NOTIFICATION_ID = 52;
+    private static final long MIN_DELAY_MS = 1_000L;
+    private static final long DEADLINE_WINDOW_MS = 15 * 60 * 1000L;
 
     // Notification channel ID.
-    private static final String PRIMARY_CHANNEL_ID =
-            "primary_notification_channel";
+    private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
     // Notification manager.
     NotificationManager mNotifyManager;
 
-    String mNotificationMessage = "mNotificationMessage";
-    Long mNextNotificationTimeInMs = 10000L; // 10s
+    public static void scheduleNextJob(android.content.Context context) {
+        if (context == null) {
+            return;
+        }
 
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+        if (scheduler == null) {
+            return;
+        }
 
-    /**
-     * Called by the system once it determines it is time to run the job.
-     *
-     * @param jobParameters Contains the information about the job.
-     * @return Boolean indicating whether or not the job was offloaded to a
-     * separate thread.
-     * In this case, it is false since the notification can be posted on
-     * the main thread.
-     */
-    @SuppressLint("MissingPermission")
+        scheduler.cancel(JOB_ID);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean isNotificationEnabled = prefs.getBoolean(
+                context.getString(R.string.settings_notification_enable),
+                true
+        );
+
+        if (!isNotificationEnabled) {
+            return;
+        }
+
+        long delay = computeDelayToNextExecution(context, prefs);
+        ComponentName serviceName = new ComponentName(context, NotificationJobService.class);
+        JobInfo jobInfo = new JobInfo.Builder(JOB_ID, serviceName)
+                .setPersisted(true)
+                .setMinimumLatency(delay)
+                .setOverrideDeadline(delay + DEADLINE_WINDOW_MS)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE)
+                .setRequiresCharging(false)
+                .setRequiresDeviceIdle(false)
+                .build();
+        scheduler.schedule(jobInfo);
+    }
+
+    public static void cancelScheduledJob(android.content.Context context) {
+        if (context == null) {
+            return;
+        }
+        JobScheduler scheduler = (JobScheduler) context.getSystemService(JOB_SCHEDULER_SERVICE);
+        if (scheduler != null) {
+            scheduler.cancel(JOB_ID);
+        }
+    }
+
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         Log.d(TAG, "onStartJob");
 
+        NotificationPayload payload = buildPayloadForCurrentPreferences();
+        if (payload != null) {
+            showNotification(payload.title, payload.message);
+        }
 
-        // Create the notification channel.
+        scheduleNextJob(getApplicationContext());
+        jobFinished(jobParameters, false);
+        return false;
+    }
+
+    private NotificationPayload buildPayloadForCurrentPreferences() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        boolean isNotificationEnabled = prefs.getBoolean(
+                getString(R.string.settings_notification_enable),
+                true
+        );
+        if (!isNotificationEnabled) {
+            return null;
+        }
+
+        int notificationDaysEarlier = readLeadDays(prefs);
+        Calendar dateToSurvey = Calendar.getInstance();
+        dateToSurvey.add(Calendar.DAY_OF_MONTH, notificationDaysEarlier);
+
+        ArrayList<ResultVegItem> resultArray = getResultsForDate(dateToSurvey);
+        if (resultArray.isEmpty()) {
+            return null;
+        }
+
+        StringBuilder messageBuilder = new StringBuilder();
+        for (int i = 0; i < resultArray.size(); i++) {
+            if (i > 0) {
+                messageBuilder.append("\n");
+            }
+            messageBuilder.append(resultArray.get(i).getMainMessage());
+        }
+        return new NotificationPayload(
+                getString(R.string.notification_default_title),
+                messageBuilder.toString()
+        );
+    }
+
+    private ArrayList<ResultVegItem> getResultsForDate(Calendar dateToSurvey) {
+        FragmentCalendar fragmentCalendar = new FragmentCalendar();
+        fragmentCalendar.setExternalContext(getApplicationContext());
+        ArrayList<ResultVegItem> resultArray = new ArrayList<>();
+        ArrayList<ResultVegItem> collectArray;
+
+        int year = dateToSurvey.get(Calendar.YEAR);
+        int month = dateToSurvey.get(Calendar.MONTH);
+        int day = dateToSurvey.get(Calendar.DAY_OF_MONTH);
+
+        if (fragmentCalendar.isDayRacine(year, month + 1, day)) {
+            resultArray = RootVegManager.getResultVegForSow(getApplicationContext(), month);
+            collectArray = RootVegManager.getResultVegForCollect(getApplicationContext(), month);
+            resultArray.addAll(collectArray);
+        } else if (fragmentCalendar.isDayFeuille(year, month + 1, day)) {
+            resultArray = LeafVegManager.getResultVegForSow(getApplicationContext(), month);
+            collectArray = LeafVegManager.getResultVegForCollect(getApplicationContext(), month);
+            resultArray.addAll(collectArray);
+        } else if (fragmentCalendar.isDayFruit(year, month + 1, day)) {
+            resultArray = FruitVegManager.getResultVegForSow(getApplicationContext(), month);
+            collectArray = FruitVegManager.getResultVegForCollect(getApplicationContext(), month);
+            resultArray.addAll(collectArray);
+        }
+
+        return resultArray;
+    }
+
+    private int readLeadDays(SharedPreferences prefs) {
+        String value = prefs.getString(
+                getString(R.string.settings_notification_nb_days_earlier),
+                AppTechnicalKeys.DEFAULT_NOTIFICATION_NB_DAYS_EARLIER
+        );
+        try {
+            int parsed = Integer.parseInt(value);
+            return Math.max(0, Math.min(30, parsed));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static long computeDelayToNextExecution(android.content.Context context, SharedPreferences prefs) {
+        String notificationTime = prefs.getString(
+                context.getString(R.string.settings_notification_time),
+                AppTechnicalKeys.DEFAULT_NOTIFICATION_TIME
+        );
+
+        int hour = 10;
+        int minute = 0;
+        if (notificationTime != null && notificationTime.contains(":")) {
+            String[] dateArray = notificationTime.split(":");
+            if (dateArray.length == 2) {
+                try {
+                    hour = Integer.parseInt(dateArray[0]);
+                    minute = Integer.parseInt(dateArray[1]);
+                } catch (NumberFormatException ignored) {
+                    // Keep defaults when parsing fails.
+                }
+            }
+        }
+
+        hour = Math.max(0, Math.min(23, hour));
+        minute = Math.max(0, Math.min(59, minute));
+
+        Calendar now = Calendar.getInstance();
+        Calendar nextRun = Calendar.getInstance();
+        nextRun.set(Calendar.HOUR_OF_DAY, hour);
+        nextRun.set(Calendar.MINUTE, minute);
+        nextRun.set(Calendar.SECOND, 0);
+        nextRun.set(Calendar.MILLISECOND, 0);
+        if (!nextRun.after(now)) {
+            nextRun.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        return Math.max(MIN_DELAY_MS, nextRun.getTimeInMillis() - now.getTimeInMillis());
+    }
+
+    @SuppressLint("MissingPermission")
+    private void showNotification(String title, String message) {
         createNotificationChannel();
 
-        // Set up the notification content intent to launch the app when
-        // clicked.
-        PendingIntent contentPendingIntent = PendingIntent.getActivity
-                (this, 0, new Intent(this, NotificationSchedulerActivity.class),
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent contentPendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                new Intent(this, Splash.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder
-                (this, PRIMARY_CHANNEL_ID)
-                .setContentTitle(getString(R.string.job_service))
-                .setContentText(mNotificationMessage)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setContentIntent(contentPendingIntent)
                 .setSmallIcon(R.drawable.ic_cancel)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -81,128 +233,10 @@ public class NotificationJobService extends JobService {
                 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) {
             Log.w(TAG, "POST_NOTIFICATIONS non accordee, notification ignoree");
-            scheduleRefresh();
-            return false;
+            return;
         }
 
-        // Get extra
-        if (jobParameters.getExtras().getBoolean("notify")) {
-            mNotifyManager.notify(0, builder.build());
-        }
-
-        scheduleRefresh();
-        return false;
-    }
-
-    @SuppressLint("MissingPermission")
-    private void scheduleRefresh() {
-        JobScheduler mJobScheduler = (JobScheduler) getApplicationContext()
-                .getSystemService(JOB_SCHEDULER_SERVICE);
-
-        // Cancel all if exist
-        mJobScheduler.cancelAll();
-
-        // Get notification parameters
-        boolean notify = getNotificationParameters();
-
-        // Set Extras
-        PersistableBundle bundle = new PersistableBundle();
-        bundle.putBoolean("notify", notify);
-
-        JobInfo.Builder mJobBuilder =
-                new JobInfo.Builder(52,
-                        new ComponentName(getPackageName(),
-                                NotificationJobService.class.getName()));
-
-        mJobBuilder
-                .setPersisted(true)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setRequiresDeviceIdle(false)
-                .setExtras(bundle)
-                .setMinimumLatency(mNextNotificationTimeInMs) // 1 minute
-                .setRequiresCharging(false);
-        mJobScheduler.schedule(mJobBuilder.build());
-    }
-
-    private boolean getNotificationParameters() {
-        boolean notify = false;
-
-        // get notification time
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String strNotificationTime = prefs.getString(
-                getString(R.string.settings_notification_time),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_TIME
-        );
-        Log.d(TAG, "onResume: strNotificationTime = " + strNotificationTime);
-
-        // get notification nb days earlier
-        String strNotificationDaysEarlier = prefs.getString(
-                getString(R.string.settings_notification_nb_days_earlier),
-                AppTechnicalKeys.DEFAULT_NOTIFICATION_NB_DAYS_EARLIER
-        );
-        int iNotificationDaysEarlier = Integer.valueOf(strNotificationDaysEarlier);
-        Log.d(TAG, "onResume: iNotificationDaysEarlier = " + iNotificationDaysEarlier);
-
-        String[] dateArray = strNotificationTime.split(":");
-        int hour = Integer.parseInt(dateArray[0]);
-        int minute = Integer.parseInt(dateArray[1]);
-
-        Calendar cal_dateToSurvey = Calendar.getInstance();
-        Date date = new Date();//initializes to now
-        cal_dateToSurvey.setTime(date);
-        cal_dateToSurvey.add(Calendar.DAY_OF_MONTH, iNotificationDaysEarlier);
-        cal_dateToSurvey.set(Calendar.HOUR_OF_DAY, hour);
-        cal_dateToSurvey.set(Calendar.MINUTE, minute);
-        cal_dateToSurvey.set(Calendar.SECOND, 0);
-
-        Calendar calendar = Calendar.getInstance();
-        Calendar setcalendar = Calendar.getInstance();
-        setcalendar.set(Calendar.HOUR_OF_DAY, hour);
-        setcalendar.set(Calendar.MINUTE, minute);
-        setcalendar.set(Calendar.SECOND, 0);
-        if(setcalendar.before(calendar))
-            setcalendar.add(Calendar.DATE,1);
-
-        FragmentCalendar fragmentCalendar = new FragmentCalendar();
-        fragmentCalendar.setExternalContext(getApplicationContext());
-        ArrayList<ResultVegItem> mResultArray = new ArrayList<>();
-        ArrayList<ResultVegItem> collectArray;
-        if (fragmentCalendar.isDayRacine(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = RootVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = RootVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-        } else if (fragmentCalendar.isDayFeuille(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = LeafVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = LeafVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-
-
-        } else if (fragmentCalendar.isDayFruit(cal_dateToSurvey.get(Calendar.YEAR), cal_dateToSurvey.get(Calendar.MONTH) + 1,
-                cal_dateToSurvey.get(Calendar.DAY_OF_MONTH))) {
-            mResultArray = FruitVegManager.getResultVegForSow(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            collectArray = FruitVegManager.getResultVegForCollect(getApplicationContext(), cal_dateToSurvey.get(Calendar.MONTH));
-            mResultArray.addAll(collectArray);
-        }
-
-        // put extra intent
-        if (!mResultArray.isEmpty()) {
-            notify = true;
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < mResultArray.size(); i++) {
-                String strMessage = mResultArray.get(i).getMainMessage() + "\n";
-                stringBuilder.append(strMessage);
-            }
-            mNotificationMessage = stringBuilder.toString();
-            Log.d(TAG, "Get notification parameters: Message = " + mNotificationMessage);
-        }
-        mNextNotificationTimeInMs = setcalendar.getTimeInMillis() - calendar.getTimeInMillis();
-        Log.d(TAG, "Get notification parameters: TimeInMs = " + mNextNotificationTimeInMs);
-        Log.d(TAG, "Get notification parameters: notify = " + notify);
-
-        return notify;
+        mNotifyManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     /**
@@ -246,6 +280,16 @@ public class NotificationJobService extends JobService {
                     (getString(R.string.notification_channel_description));
 
             mNotifyManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+    private static final class NotificationPayload {
+        final String title;
+        final String message;
+
+        NotificationPayload(String title, String message) {
+            this.title = title;
+            this.message = message;
         }
     }
 

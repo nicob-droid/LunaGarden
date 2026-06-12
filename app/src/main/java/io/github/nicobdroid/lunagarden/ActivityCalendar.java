@@ -297,35 +297,7 @@ public class ActivityCalendar extends AppCompatActivity {
     }
 
     private void startJobScheduler() {
-
-        // Read if notifications are enabled
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        boolean bIsNotificationEnabled = prefs.getBoolean(getString(R.string.settings_notification_enable), false);
-
-        Log.d(TAG, "Start Job Scheduler: " + bIsNotificationEnabled);
-
-        if (bIsNotificationEnabled) {
-            // Set Extras
-            PersistableBundle bundle = new PersistableBundle();
-            bundle.putBoolean("notify", false);
-
-
-            ComponentName serviceName = new ComponentName(getPackageName(),
-                    NotificationJobService.class.getName());
-            JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, serviceName)
-                    .setPersisted(true)
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setRequiresDeviceIdle(false)
-                    //   .setMinimumLatency(timeInMs) // 1 minute
-                    .setExtras(bundle)
-                    .setRequiresCharging(false);
-
-            JobInfo myJobInfo = builder.build();
-            mScheduler.schedule(myJobInfo);
-            Toast.makeText(this, R.string.job_scheduled, Toast.LENGTH_SHORT)
-                    .show();
-        }
-
+        NotificationJobService.scheduleNextJob(getApplicationContext());
     }
 
 }
