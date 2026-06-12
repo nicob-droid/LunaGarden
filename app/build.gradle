@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+def versionMajor = (project.findProperty('VERSION_MAJOR') ?: '1').toInteger()
+def versionMinor = (project.findProperty('VERSION_MINOR') ?: '0').toInteger()
+def versionPatch = (project.findProperty('VERSION_PATCH') ?: '0').toInteger()
+def computedVersionCode = (versionMajor * 10000) + (versionMinor * 100) + versionPatch
+def computedVersionName = "${versionMajor}.${versionMinor}.${versionPatch}"
+
 android {
     namespace = "io.github.nicobdroid.lunagarden"
     compileSdk = 36
@@ -7,8 +13,8 @@ android {
         applicationId "io.github.nicobdroid.lunagarden"
         minSdk = 24
         targetSdk = 36
-        versionCode 1
-        versionName "1.0"
+        versionCode computedVersionCode
+        versionName computedVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
