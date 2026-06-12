@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0F8895</color>
+    <color name="colorPrimaryDark">#0F8895</color>
+    <color name="colorAccent">#880000</color>
+    <color name="colorTitles">#FFFFFF</color>
+    <color name="colorTextButtons">#FFFFFF</color>
+    <color name="colorSubtitles">#FF9900</color>
+    <color name="colorMainTextView">#FF9900</color>
+    <color name="colorSecondTextView">#FF9900</color>
+
+    <!--<color name="colorPrimary">#FFFFFF</color>-->
+    <!--<color name="colorPrimaryDark">#0F6195</color>-->
+    <!--<color name="colorAccent">#FF4081</color>-->
+    <!--<color name="colorTitles">#992200</color>-->
+    <!--<color name="colorTextButtons">#FFFFFF</color>-->
+    <!--<color name="colorSubtitles">#0F9844</color>-->
+    <!--<color name="colorMainTextView">#0F9844</color>-->
+    <!--<color name="colorSecondTextView">#AA3300</color>-->
+
+    <color name="itemSelected">#9FCCD5</color>
+
+
+    <color name="colorTextButton">@color/colorTextButtons</color>
+    <color name="colorTextRadioButton">@color/colorTitles</color>
+    <color name="colorTitleDivider">@color/colorTitles</color>
+
+    <color name="list_title_text_color">@color/colorTitles</color>
+    <color name="list_subtitle_text_color">@color/colorSubtitles</color>
+
+
+    <color name="list_title_result_sow_color">@color/colorAccent</color>
+    <color name="list_title_result_collect_color">@color/colorSubtitles</color>
+    <color name="list_title_result_color">@color/colorTitles</color>
+    <color name="list_subtitle_result_color">@color/colorTitles</color>
+
+</resources>

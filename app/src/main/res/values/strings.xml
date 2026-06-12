@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">LunaGarden</string>
+    <string name="january">Janvier</string>
+    <string name="february">Février</string>
+    <string name="march">Mars</string>
+    <string name="april">Avril</string>
+    <string name="may">Mai</string>
+    <string name="june">Juin</string>
+    <string name="july">Juillet</string>
+    <string name="august">Août</string>
+    <string name="september">Septembre</string>
+    <string name="october">Octobre</string>
+    <string name="november">Novembre</string>
+    <string name="december">Décembre</string>
+
+    <string name="select_racine">Dans mon jardin idéal, on trouve les légumes racines suivants:</string>
+    <string name="validate">Valider</string>
+    <string name="cancel">Annuler</string>
+
+
+    <string name="message_welcome">Bienvenue dans \nLunaGarden.</string>
+    <string name="message_settings">Avant de commencer, merci de sélectionner les légumes de votre jardin idéal.</string>
+    <string name="message_settings_done">La configuration de votre jardin idéal est terminée.</string>
+    <string name="message_sub_settings_done">Amusez-vous bien !\n Vous pouvez reconfigurer votre jardin idéal à tout moment.</string>
+    <string name="message_is_fruit_veg">Dans mon jardin idéal\n on trouve des légumes fruits</string>
+    <string name="message_is_root_veg">Dans mon jardin idéal\n on trouve des légumes racines</string>
+    <string name="message_is_leaf_veg">Dans mon jardin idéal\n on trouve des légumes feuilles</string>
+    <string name="example_fruit_veg">(aubergine, courge, haricot, poivron, tomate, etc)</string>
+    <string name="example_root_veg">(ail, carotte, navet, pomme de terre, radis, etc)</string>
+    <string name="example_leaf_veg">(blette, chou, épinard, salade, poireau, etc)</string>
+    <string name="title_is_fruit_veg">Légumes fruits</string>
+    <string name="title_is_root_veg">Légumes racines</string>
+    <string name="title_is_leaf_veg">Légumes feuilles</string>
+
+    <string name="select_root_veg">Mes légumes racines sont:</string>
+    <string name="button_next">Suivant</string>
+    <string name="button_previous">Précédent</string>
+    <string name="button_finish">Terminé</string>
+    <string name="click_no">Non</string>
+    <string name="click_yes">Oui</string>
+    <string name="please_wait">Veuillez patienter</string>
+    <string name="ascending_moon_node">Noeud lunaire ascendant: ne pas jardiner</string>
+    <string name="descending_moon_node">Noeud lunaire descendant: ne pas jardiner</string>
+    <string name="moon_apogee">Apogée: ne pas jardiner</string>
+    <string name="moon_perigee">Périgée: ne pas jardiner</string>
+	<string name="moon_apogee_message">A son apogée, l\'attraction de la Lune est trop faible : les semis lèvent mal, restent faibles et seront vulnérables aux maladies.
+	\nIl est donc déconseillé de jardiner 5h avant et après l’apogée de la Lune.</string>
+	<string name="moon_perigee_message">Quand la Lune est à son périgée, son attraction est trop forte : les semis filent, s’étiolent et produiront des plantes plus fragiles. 
+	\nOn évite donc de s’occuper du jardin 5h avant et après le périgée de la Lune.</string>
+	<string name="moon_node_message">Lorsque la Lune coupe le plan de rotation de la Terre, cela correspond à un nœud lunaire. 
+	Cet événement se produit deux fois au cours d’un mois lunaire, lors d’un nœud ascendant et d’un nœud  descendant.
+	\nL’influence de la Lune n’étant pas profitable durant ces moments, il est déconseillé de jardiner 5h avant et après ces nœuds.</string>
+	
+    <string name="settings">Paramètres</string>
+    <string name="configuration">Configuration</string>
+    <string name="reconfiguration_message">Il est possible de reconfigurer les légumes de votre jardin idéal à tout moment.</string>
+    <string name="notification_time_message">Spécifier l\'heure de notification pour être prévenu d\'une eventuelle action à effectuer dans votre jardin.</string>
+    <string name="notification_days_earlier_message">Il est possible de recevoir une notification avec un ou plusieurs jours à l\'avance pour optimiser l\organisation de votre jardin idéal.</string>
+
+    <string name="result_sow_item">Vous pouvez semer: </string>
+
+    <string name="enable_notification">Notifications</string>
+    <string name="seconds">%1$d s</string>
+    <string name="required_network_type">Type de reseau requis :</string>
+    <string name="none">Aucun</string>
+    <string name="any">Tous</string>
+    <string name="wifi">Wi-Fi</string>
+    <string name="requires">Requiert :</string>
+    <string name="device_idle">Appareil inactif</string>
+    <string name="device_charging">Appareil en charge</string>
+    <string name="override_deadline">Delai maximal :</string>
+    <string name="not_set">Non defini</string>
+    <string name="schedule_job">Planifier la tache</string>
+    <string name="cancel_jobs">Annuler les taches</string>
+    <string name="job_service">Service de tache</string>
+    <string name="job_running">Votre tache s\'est executee jusqu\'au bout !</string>
+    <string name="job_service_notification">Notification du service de tache</string>
+    <string name="notification_channel_description">Notifications du service de tache</string>
+    <string name="job_scheduled">Tache planifiee, elle s\'executera quand les contraintes seront remplies</string>
+    <string name="no_constraint_toast">Veuillez definir au moins une contrainte</string>
+    <string name="jobs_canceled">Taches annulées</string>
+
+    <string name="action_sow_format">Vous pouvez semer: %1$s</string>
+    <string name="action_collect_format">Vous pouvez récolter: %1$s</string>
+
+    <string name="dialog_save">Enregistrer</string>
+    <string name="dialog_cancel">Annuler</string>
+
+    <string name="notification_android_channel_name">Notifications LunaGarden</string>
+    <string name="notification_service_channel_name">Service de notification</string>
+    <string name="notification_default_title">LunaGarden</string>
+    <string name="notification_default_text">Consultez les actions du jour.</string>
+    <string name="notification_debug_post_execute">postExecute</string>
+
+</resources>

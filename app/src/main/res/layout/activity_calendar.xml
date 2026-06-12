@@ -1,0 +1,88 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="clip_vertical"
+    android:keepScreenOn="true"
+    tools:ignore="TextFields,HardcodedText">
+
+    <TextView
+        android:id="@+id/pleaseWait"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/please_wait"
+        android:gravity="center"
+        android:visibility="visible"/>
+
+
+    <RelativeLayout
+        android:id="@+id/mainLayout"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorSubtitles">
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Date"
+                android:textColor="@color/colorTitles" />
+
+            <TextView
+                android:id="@+id/moon"
+                android:layout_width="46dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/date"
+                android:gravity="center"
+                android:text="Lune"
+                android:textColor="@color/colorTitles" />
+
+            <TextView
+                android:id="@+id/semis"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/moon"
+                android:gravity="center"
+                android:text="Semis"
+                android:textColor="@color/colorTitles" />
+
+            <TextView
+                android:id="@+id/recolte"
+                android:layout_width="55dp"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/semis"
+                android:gravity="center"
+                android:text="Récolte"
+                android:textColor="@color/colorTitles" />
+
+            <TextView
+                android:id="@+id/resume"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/recolte"
+                android:gravity="center"
+                android:text="Action"
+                android:textColor="@color/colorTitles" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/layout"
+            android:layout_alignParentStart="true"
+            android:choiceMode="singleChoice"
+            android:layout_marginBottom="10dp">
+
+        </ListView>
+
+
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:padding="@dimen/view_left_right_margin" >
+
+    <CheckBox
+        android:id="@+id/checkbox_imageview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:buttonTint="@color/colorTextRadioButton"
+        android:layout_centerVertical="true" >
+    </CheckBox>
+
+    <ImageView
+        android:id="@+id/profile_imageview"
+        android:layout_width="@dimen/profile_photo_width_height"
+        android:layout_height="@dimen/profile_photo_width_height"
+        android:layout_centerVertical="true" >
+    </ImageView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_margin="@dimen/relativelayout_margin"
+        android:layout_toLeftOf="@id/checkbox_imageview"
+        android:layout_toRightOf="@id/profile_imageview" >
+
+        <TextView
+            android:id="@+id/header_textview"
+            style="@style/ListTitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/sub_textview"
+            style="@style/ListSubtitleTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/header_textview"
+            android:ellipsize="end"
+            android:lines="2" />
+    </RelativeLayout>
+
+</RelativeLayout>

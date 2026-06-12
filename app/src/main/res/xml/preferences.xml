@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="General" >
+        <Preference
+            android:icon="@drawable/tomate"
+            android:summary="@string/reconfiguration_message"
+            android:title="@string/configuration">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="io.github.nicobdroid.lunagarden.settings.FragmentBackStackActivity"
+                android:targetPackage="io.github.nicobdroid.lunagarden" />
+        </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Notifications">
+        <SwitchPreference
+            android:icon="@drawable/chou_pomme_hiver"
+            android:key="@string/settings_notification_enable"
+            android:title="@string/enable_notification"
+            android:defaultValue="true" />
+
+        <io.github.nicobdroid.lunagarden.TimePreference
+            android:icon="@drawable/chou_pomme_printemps"
+            android:title="Heure fixe de notification"
+            android:key="@string/settings_notification_time"
+            android:summary="@string/notification_time_message"
+            android:defaultValue="10:00"
+            />
+
+        <ListPreference
+            android:icon="@drawable/chou_pomme_automne"
+            android:defaultValue="0"
+            android:entries="@array/listArray"
+            android:entryValues="@array/listValues"
+            android:key="@string/settings_notification_nb_days_earlier"
+            android:summary="@string/notification_days_earlier_message"
+            android:title="Notifier 0, 1 ou plusieurs jours à l'avance" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="A propos">
+        <EditTextPreference
+            android:icon="@drawable/tournesol"
+            android:key="username"
+            android:summary="Please provide your username"
+            android:title="Your Name">
+        </EditTextPreference>
+
+    </PreferenceCategory>
+</PreferenceScreen>

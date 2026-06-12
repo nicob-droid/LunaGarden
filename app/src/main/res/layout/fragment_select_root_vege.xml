@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:keepScreenOn="true"
+    android:padding="@dimen/activity_vertical_margin"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textview"
+        style="@style/TextAppearance.Sphinx.DialogWindowTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/title_is_root_veg"
+        android:textColor="@color/colorTitles"
+        android:textSize="20sp" />
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/fragment_divider_top_margin"
+        android:layout_marginBottom="@dimen/fragment_divider_bottom_margin"
+        android:layout_marginStart="@dimen/fragment_divider_horizontal_margin"
+        android:layout_marginEnd="@dimen/fragment_divider_horizontal_margin"
+        android:layout_below="@+id/textview"
+        android:layout_height="1dp"
+        android:background="@color/colorTitleDivider"/>
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider"
+        android:fontFamily="casual"
+        android:gravity="center"
+        android:text="@string/select_root_veg"
+        android:textColor="@color/colorSubtitles"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_below="@id/message"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical" >
+        <ListView
+            android:id="@+id/listview"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:stackFromBottom="false" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:weightSum="2"
+            android:orientation="horizontal">
+
+            <Button style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/btPrevious"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_gravity="bottom"
+                android:background="@drawable/buttonshape"
+                android:text="@string/button_previous"
+                android:textColor="@color/colorTextButton"
+                android:layout_weight="1"/>
+
+            <Button style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/btNext"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/button_next"
+                android:background="@drawable/buttonshape"
+                android:layout_gravity="bottom"
+                android:textColor="@color/colorTextButton"
+                android:layout_weight="1"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

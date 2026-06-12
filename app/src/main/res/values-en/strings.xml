@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">LunaGarden</string>
+    <string name="january">January</string>
+    <string name="february">February</string>
+    <string name="march">March</string>
+    <string name="april">April</string>
+    <string name="may">May</string>
+    <string name="june">June</string>
+    <string name="july">July</string>
+    <string name="august">August</string>
+    <string name="september">September</string>
+    <string name="october">October</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
+
+    <string name="select_racine">In my ideal garden, I have the following root vegetables:</string>
+    <string name="validate">Validate</string>
+    <string name="cancel">Cancel</string>
+
+
+    <string name="message_welcome">Welcome to \nLunaGarden.</string>
+    <string name="message_settings">Before you begin, please select the vegetables in your ideal garden.</string>
+    <string name="message_settings_done">Your ideal garden setup is complete.</string>
+    <string name="message_sub_settings_done">Have fun!\n You can reconfigure your ideal garden at any time.</string>
+    <string name="message_is_fruit_veg">In my ideal garden\n there are fruit vegetables</string>
+    <string name="message_is_root_veg">In my ideal garden\n there are root vegetables</string>
+    <string name="message_is_leaf_veg">In my ideal garden\n there are leaf vegetables</string>
+    <string name="example_fruit_veg">(eggplant, squash, bean, pepper, tomato, etc)</string>
+    <string name="example_root_veg">(garlic, carrot, turnip, potato, radish, etc)</string>
+    <string name="example_leaf_veg">(chard, cabbage, spinach, lettuce, leek, etc)</string>
+    <string name="title_is_fruit_veg">Fruit vegetables</string>
+    <string name="title_is_root_veg">Root vegetables</string>
+    <string name="title_is_leaf_veg">Leaf vegetables</string>
+
+    <string name="select_root_veg">My root vegetables are:</string>
+    <string name="button_next">Next</string>
+    <string name="button_previous">Previous</string>
+    <string name="button_finish">Finish</string>
+    <string name="click_no">No</string>
+    <string name="click_yes">Yes</string>
+    <string name="please_wait">Please wait</string>
+    <string name="ascending_moon_node">Ascending lunar node: do not garden</string>
+    <string name="descending_moon_node">Descending lunar node: do not garden</string>
+    <string name="moon_apogee">Apogee: do not garden</string>
+    <string name="moon_perigee">Perigee: do not garden</string>
+	<string name="moon_apogee_message">At apogee, the Moon\'s attraction is too weak: seedlings sprout poorly, remain weak, and become vulnerable to disease.
+	\nIt is therefore not recommended to garden 5 hours before and after the Moon\'s apogee.</string>
+	<string name="moon_perigee_message">When the Moon is at perigee, its attraction is too strong: seedlings become leggy, wither, and produce more fragile plants.
+	\nSo avoid working in the garden 5 hours before and after the Moon\'s perigee.</string>
+	<string name="moon_node_message">When the Moon crosses the Earth\'s orbital plane, this corresponds to a lunar node.
+	This event occurs twice during a lunar month: once at the ascending node and once at the descending node.
+	\nBecause the Moon\'s influence is not favorable at these times, it is not recommended to garden 5 hours before and after these nodes.</string>
+
+    <string name="settings">Settings</string>
+    <string name="configuration">Configuration</string>
+    <string name="reconfiguration_message">You can reconfigure your ideal garden vegetables at any time.</string>
+    <string name="notification_time_message">Set the notification time to be informed of any action to perform in your garden.</string>
+    <string name="notification_days_earlier_message">You can receive a notification one or more days in advance to better organize your ideal garden.</string>
+
+    <string name="result_sow_item">You can sow: </string>
+
+    <string name="enable_notification">Notifications</string>
+    <string name="seconds">%1$d s</string>
+    <string name="required_network_type">Network Type Required:</string>
+    <string name="none">None</string>
+    <string name="any">Any</string>
+    <string name="wifi">Wifi</string>
+    <string name="requires">Requires:</string>
+    <string name="device_idle">Device Idle</string>
+    <string name="device_charging">Device Charging</string>
+    <string name="override_deadline">Override Deadline:</string>
+    <string name="not_set">Not set</string>
+    <string name="schedule_job">Schedule Job</string>
+    <string name="cancel_jobs">Cancel Jobs</string>
+    <string name="job_service">Job Service</string>
+    <string name="job_running">Your Job ran to completion!</string>
+    <string name="job_service_notification">Job Service notification</string>
+    <string name="notification_channel_description">Notifications from Job Service</string>
+    <string name="job_scheduled">Job Scheduled, will run when the constraints are met</string>
+    <string name="no_constraint_toast">Please set at least one constraint</string>
+    <string name="jobs_canceled">Jobs Canceled</string>
+
+    <string name="action_sow_format">You can sow: %1$s</string>
+    <string name="action_collect_format">You can harvest: %1$s</string>
+
+    <string name="dialog_save">Save</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <string name="notification_android_channel_name">LunaGarden notifications</string>
+    <string name="notification_service_channel_name">Notification service</string>
+    <string name="notification_default_title">LunaGarden</string>
+    <string name="notification_default_text">Check today\'s actions.</string>
+    <string name="notification_debug_post_execute">postExecute</string>
+
+</resources>
