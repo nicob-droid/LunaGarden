@@ -33,6 +33,13 @@ public class FragmentIsFruitVeg extends Fragment {
         radiobuttonYes = retView.findViewById(R.id.radiobuttonYes);
         radiobuttonYes.setChecked(fruitVegPrefs.isFruitVegEnabled());
 
+        Button btCancel = retView.findViewById(R.id.btCancel);
+        btCancel.setOnClickListener(view -> {
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
+
         Button btNext = retView.findViewById(R.id.btNext);
         btNext.setOnClickListener(view -> clickOnButtonNext(Objects.requireNonNull(fragmentManager)));
 
@@ -114,4 +121,3 @@ public class FragmentIsFruitVeg extends Fragment {
     }
 
 }
-

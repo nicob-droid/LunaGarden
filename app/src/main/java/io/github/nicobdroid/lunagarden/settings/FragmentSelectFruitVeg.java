@@ -53,6 +53,12 @@ public class FragmentSelectFruitVeg extends Fragment {
         populateFruitList(mFruitList);
 
 
+        Button btCancel = retView.findViewById(R.id.btCancel);
+        btCancel.setOnClickListener(view -> {
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
 
         Button btNext = retView.findViewById(R.id.btNext);
         btNext.setOnClickListener(view -> clickOnButtonNext(Objects.requireNonNull(fragmentManager)));
@@ -135,7 +141,7 @@ public class FragmentSelectFruitVeg extends Fragment {
                 mOneVegChecked = true;
             }
         }
-        // Si aucun lÃƒÂ©gume sÃƒÂ©lectionnÃƒÂ©, alors dÃƒÂ©sactiver les lÃƒÂ©gumes racines
+        // Si aucun lÃ©gume sÃ©lectionnÃ©, alors dÃ©sactiver les lÃ©gumes racines
         if (!mOneVegChecked) {
             fruitVegPrefs.saveFruitVegEnable(getString(R.string.default_fruit_veg_enable));
         }
@@ -165,4 +171,3 @@ public class FragmentSelectFruitVeg extends Fragment {
 
 
 }
-

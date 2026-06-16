@@ -54,33 +54,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_horizontal_margin"
-            android:weightSum="2"
             android:orientation="horizontal">
 
-            <Button style="?android:attr/buttonBarButtonStyle"
+            <Button
+                android:id="@+id/btCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:background="@drawable/buttonshape"
+                android:text="@string/cancel"
+                android:textColor="@color/colorTextButton" />
+
+            <Button
                 android:id="@+id/btPrevious"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
-                android:layout_gravity="bottom"
                 android:background="@drawable/buttonshape"
                 android:text="@string/button_previous"
-                android:textColor="@color/colorTextButton"
-                android:layout_weight="1"/>
+                android:textColor="@color/colorTextButton" />
 
-            <Button style="?android:attr/buttonBarButtonStyle"
+            <Button
                 android:id="@+id/btNext"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                android:layout_marginStart="@dimen/activity_horizontal_margin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@string/button_next"
-                android:background="@drawable/buttonshape"
-                android:layout_gravity="bottom"
-                android:textColor="@color/colorTextButton"
                 android:layout_weight="1"
-                />
+                android:background="@drawable/buttonshape"
+                android:text="@string/button_next"
+                android:textColor="@color/colorTextButton" />
 
         </LinearLayout>
     </LinearLayout>

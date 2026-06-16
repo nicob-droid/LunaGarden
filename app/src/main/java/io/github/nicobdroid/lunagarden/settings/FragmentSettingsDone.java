@@ -19,19 +19,21 @@ public class FragmentSettingsDone extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View retView = inflater.inflate(R.layout.fragment_settings_done, container, false);
 
-//        final FragmentManager fragmentManager = getFragmentManager();
+        Button btCancel = retView.findViewById(R.id.btCancel);
+        btCancel.setOnClickListener(view -> {
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
 
         Button btNext = retView.findViewById(R.id.btNext);
         btNext.setOnClickListener(view -> {
-//                clearStack();
-
             // Save settings are done
             FruitVegPrefs fruitVegPrefs = new FruitVegPrefs(requireContext());
             fruitVegPrefs.saveSettingsDone();
 
             // Start calendar activity
             Intent intent = new Intent(getContext(), Splash.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             // Clear back stack
             new Thread() {
@@ -46,4 +48,3 @@ public class FragmentSettingsDone extends Fragment {
     }
 
 }
-

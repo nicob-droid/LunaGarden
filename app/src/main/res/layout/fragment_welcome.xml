@@ -6,22 +6,40 @@
     android:orientation="vertical"
     android:padding="@dimen/activity_vertical_margin">
 
-
-    <Button
-        android:id="@+id/btNext"
+    <LinearLayout
+        android:id="@+id/buttonPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/activity_horizontal_margin"
-        android:background="@drawable/buttonshape"
-        android:text="@string/button_next"
-        android:textColor="@color/colorTextButton" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:background="@drawable/buttonshape"
+            android:text="@string/cancel"
+            android:textColor="@color/colorTextButton" />
+
+        <Button
+            android:id="@+id/btNext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:background="@drawable/buttonshape"
+            android:text="@string/button_next"
+            android:textColor="@color/colorTextButton" />
+
+    </LinearLayout>
 
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btNext"
+        android:layout_above="@id/buttonPanel"
         android:layout_centerInParent="true">
 
         <TextView

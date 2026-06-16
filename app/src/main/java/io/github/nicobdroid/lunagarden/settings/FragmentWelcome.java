@@ -22,7 +22,12 @@ public class FragmentWelcome extends Fragment {
 
         final FragmentManager fragmentManager = getFragmentManager();
 
-
+        Button btCancel = retView.findViewById(R.id.btCancel);
+        btCancel.setOnClickListener(view -> {
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
 
         Button btNext = retView.findViewById(R.id.btNext);
         btNext.setOnClickListener(view -> clickOnButtonNext(fragmentManager));
@@ -52,4 +57,3 @@ public class FragmentWelcome extends Fragment {
         FragmentUtil.printActivityFragmentList(fragmentManager);
     }
 }
-

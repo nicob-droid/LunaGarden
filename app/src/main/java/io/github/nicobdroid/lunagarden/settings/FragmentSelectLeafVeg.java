@@ -51,6 +51,13 @@ public class FragmentSelectLeafVeg extends Fragment {
         mFruitList = LeafVegManager.getFruitItemList(getContext());
         populateFruitList(mFruitList);
 
+        Button btCancel = retView.findViewById(R.id.btCancel);
+        btCancel.setOnClickListener(view -> {
+            if (getActivity() != null) {
+                getActivity().finish();
+            }
+        });
+
         Button btNext = retView.findViewById(R.id.btNext);
         btNext.setOnClickListener(view -> clickOnButtonNext(Objects.requireNonNull(fragmentManager)));
 
@@ -159,4 +166,3 @@ public class FragmentSelectLeafVeg extends Fragment {
 
 
 }
-
