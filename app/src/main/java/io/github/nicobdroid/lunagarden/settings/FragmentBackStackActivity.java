@@ -40,14 +40,18 @@ public class FragmentBackStackActivity extends AppCompatActivity {
 
         // Get FragmentManager and FragmentTransaction object.
         FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        // Create FragmentOne instance.
-        FragmentWelcome fragmentWelcome = new FragmentWelcome();
+        // Only add the fragment if this is the first creation (not after rotation)
+        if (savedInstanceState == null) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        // Add fragment one with tag name.
-        fragmentTransaction.add(R.id.fragment_back_stack_frame_layout, fragmentWelcome, FragmentTags.WELCOME);
-        fragmentTransaction.commit();
+            // Create FragmentOne instance.
+            FragmentWelcome fragmentWelcome = new FragmentWelcome();
+
+            // Add fragment one with tag name.
+            fragmentTransaction.add(R.id.fragment_back_stack_frame_layout, fragmentWelcome, FragmentTags.WELCOME);
+            fragmentTransaction.commit();
+        }
 
         FragmentUtil.printActivityFragmentList(fragmentManager);
     }
