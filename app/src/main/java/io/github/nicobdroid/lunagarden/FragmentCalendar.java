@@ -17,15 +17,10 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
 import io.github.nicobdroid.lunagarden.settings.FruitVegPrefs;
@@ -39,6 +34,8 @@ public class FragmentCalendar extends Fragment {
 
     protected FragmentActivity mActivity;
     private Context mExternalContext;
+    /** Calculateur lunaire indépendant du Fragment. */
+    private MoonDayCalculator mMoonDayCalculator;
 
     private static final double MOON_PHASE_LENGTH = 29.530588853;
     private ListView listView;
@@ -74,10 +71,7 @@ public class FragmentCalendar extends Fragment {
     private static int actualYear;
     private static int actualMonth;
     private static int actualDay;
-    private final Map<Integer, Boolean> dayRootCache = new HashMap<>();
-    private final Map<Integer, Boolean> dayLeafCache = new HashMap<>();
-    private final Map<Integer, Boolean> dayFruitCache = new HashMap<>();
-    private final Map<Long, Boolean> moonNodeCache = new HashMap<>();
+    // Les caches sont maintenant dans MoonDayCalculator
 
     private static final class DayComputation {
         int specialType = SPECIAL_NONE;
@@ -102,13 +96,12 @@ public class FragmentCalendar extends Fragment {
     public void setExternalContext(Context context) {
         if (context != null) {
             mExternalContext = context.getApplicationContext();
+            mMoonDayCalculator = new MoonDayCalculator(mExternalContext);
         }
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        clearComputationCaches();
 
         actualYear = Calendar.getInstance().get(Calendar.YEAR);
         actualMonth = Calendar.getInstance().get(Calendar.MONTH);
@@ -117,22 +110,10 @@ public class FragmentCalendar extends Fragment {
         Bundle args = requireArguments();
         mMonthId = args.getInt("month", 0);
         mYearId = args.getInt("year", 2018);
+
+        mMoonDayCalculator = new MoonDayCalculator(requireContext());
     }
 
-    private void clearComputationCaches() {
-        dayRootCache.clear();
-        dayLeafCache.clear();
-        dayFruitCache.clear();
-        moonNodeCache.clear();
-    }
-
-    private static int dayKey(int year, int month, int day) {
-        return year * 10_000 + month * 100 + day;
-    }
-
-    private static long moonNodeKey(int nodeType, int year, int month, int day) {
-        return (((long) nodeType) << 32) | (dayKey(year, month, day) & 0xFFFFFFFFL);
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -497,412 +478,59 @@ public class FragmentCalendar extends Fragment {
         }
     }
 
-    // Computes moon phase based upon Bradley E. Schaefer's moon phase algorithm.
+    // Calculs lunaires - délégués à MoonDayCalculator (logique métier découplée de l'UI)
+
     private double computeMoonPhase(int year, int month, int day) {
-        //Log.i(TAG, "computeMoonPhase: year=" + year + " month=" + month + " day=" + day);
-
-        // Convert the year into the format expected by the algorithm.
-        double transformedYear = year - Math.floor((double) (12 - month) / 10);
-        //Log.i(TAG, "transformedYear: " + transformedYear);
-
-        // Convert the month into the format expected by the algorithm.
-        int transformedMonth = month + 9;
-        if (transformedMonth >= 12) {
-            transformedMonth = transformedMonth - 12;
-        }
-        //Log.i(TAG, "transformedMonth: " + transformedMonth);
-
-        // Logic to compute moon phase as a fraction between 0 and 1
-        double term1 = Math.floor(365.25 * (transformedYear + 4712));
-        double term2 = Math.floor(30.6 * transformedMonth + 0.5);
-        double term3 = Math.floor(Math.floor((transformedYear / 100) + 49) * 0.75) - 38;
-
-        double intermediate = term1 + term2 + day + 59;
-        if (intermediate > 2299160) {
-            intermediate = intermediate - term3;
-        }
-        //Log.i(TAG, "intermediate: " + intermediate);
-
-        double normalizedPhase = (intermediate - 2451550.1) / MOON_PHASE_LENGTH;
-        normalizedPhase = normalizedPhase - Math.floor(normalizedPhase);
-        if (normalizedPhase < 0) {
-            normalizedPhase = normalizedPhase + 1;
-        }
-        //Log.i(TAG, "normalizedPhase: " + normalizedPhase);
-
-        // Return the result as a value between 0 and MOON_PHASE_LENGTH
-        return normalizedPhase * MOON_PHASE_LENGTH;
+        return getCalculator().computeMoonPhase(year, month, day);
     }
 
     private boolean isAscendingMoonNode(int year, int month, int day) {
-        return isMoonNode(MOON_NODE_ASCENDING_NODE, year, month, day);
+        return getCalculator().isMoonNode(MoonDayCalculator.MOON_NODE_ASCENDING_NODE, year, month, day);
     }
 
     private boolean isDescendingMoonNode(int year, int month, int day) {
-        return isMoonNode(MOON_NODE_DESCENDING_NODE, year, month, day);
+        return getCalculator().isMoonNode(MoonDayCalculator.MOON_NODE_DESCENDING_NODE, year, month, day);
     }
 
     private boolean isApogee(int year, int month, int day) {
-        return isMoonNode(MOON_NODE_APOGEE, year, month, day);
+        return getCalculator().isMoonNode(MoonDayCalculator.MOON_NODE_APOGEE, year, month, day);
     }
 
     private boolean isPerigee(int year, int month, int day) {
-        return isMoonNode(MOON_NODE_PERIGEE, year, month, day);
-    }
-
-    private String getLastRefDayRacine(int dayRacine) {
-        // 10 jours racine max par mois
-        String strResult;
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        strResult = saveMoonInfo.readDayRacine(dayRacine);
-        return strResult;
-    }
-
-    private String getLastRefDayFeuille(int dayFeuille) {
-        // 10 jours racine max par mois
-        String strResult;
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        strResult = saveMoonInfo.readDayFeuille(dayFeuille);
-        return strResult;
-    }
-
-    private String getLastRefDayFruit(int dayFruit) {
-        String strResult;
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        strResult = saveMoonInfo.readDayFruit(dayFruit);
-        return strResult;
-    }
-
-    private String getLastRefMoonNode(int nodeType) {
-        String strResult;
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        switch (nodeType) {
-            case MOON_NODE_ASCENDING_NODE:
-                strResult = saveMoonInfo.readAscendingMoonNodeDate();
-                break;
-            case MOON_NODE_DESCENDING_NODE:
-                strResult = saveMoonInfo.readDescendingMoonNodeDate();
-                break;
-            case MOON_NODE_APOGEE:
-                strResult = saveMoonInfo.readApogeeMoonDate();
-                break;
-            case MOON_NODE_PERIGEE:
-                strResult = saveMoonInfo.readPerigeeMoonDate();
-                break;
-            default:
-                strResult = saveMoonInfo.readAscendingMoonNodeDate();
-                break;
-        }
-        return strResult;
-    }
-
-    private void saveLastRefMoonNode(int nodeType, String strValue) {
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-
-        switch (nodeType) {
-            case MOON_NODE_ASCENDING_NODE:
-                saveMoonInfo.saveAscendingMoonNodeDate(strValue);
-                break;
-            case MOON_NODE_DESCENDING_NODE:
-                saveMoonInfo.saveDescendingMoonNodeDate(strValue);
-                break;
-            case MOON_NODE_APOGEE:
-                saveMoonInfo.saveApogeeMoonDate(strValue);
-                break;
-            case MOON_NODE_PERIGEE:
-                saveMoonInfo.savePerigeeMoonDate(strValue);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void saveLastRefDayRacine(int dayRacine, String strValue) {
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        saveMoonInfo.saveDayRacine(dayRacine, strValue);
-    }
-
-    private void saveLastRefDayFeuille(int dayFeuille, String strValue) {
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        saveMoonInfo.saveDayFeuille(dayFeuille, strValue);
-    }
-
-    private void saveLastRefDayFruit(int dayFruit, String strValue) {
-        SaveMoonInfo saveMoonInfo = new SaveMoonInfo(getSafeContext());
-        saveMoonInfo.saveDayFruit(dayFruit, strValue);
-    }
-
-    private Context getSafeContext() {
-        if (mExternalContext != null) {
-            return mExternalContext;
-        }
-        if (mActivity != null) {
-            return mActivity.getApplicationContext();
-        }
-        Context fragmentContext = getContext();
-        if (fragmentContext != null) {
-            return fragmentContext.getApplicationContext();
-        }
-        throw new IllegalStateException("Context is not available in FragmentCalendar");
+        return getCalculator().isMoonNode(MoonDayCalculator.MOON_NODE_PERIGEE, year, month, day);
     }
 
     public boolean isDayRacine(int year, int month, int day) {
-        int cacheKey = dayKey(year, month, day);
-        Boolean cachedResult = dayRootCache.get(cacheKey);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        boolean bResult = false;
-
-        for (int dayRacine = 0; dayRacine < 10; dayRacine++) {
-            String strDateRef1 = getLastRefDayRacine(dayRacine); // seulement le 1er pour l'instant
-
-            DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
-            try {
-                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
-                for (int i = 0; i < 26; i++) {
-
-                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
-                    Calendar calendarRef1 = Calendar.getInstance();
-                    calendarRef1.setTime(newDateRef1);
-
-                    // sauvegarder si date plus ancienne que le jour d'aujourdhui - 3 mois
-                    Date referenceDate = new Date();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(referenceDate);
-                    c.add(Calendar.MONTH, -3);
-                    if (c.after(calendarRef1)) {
-                        String formatted = dateFormatNodeRef.format(calendarRef1.getTime());
-                        saveLastRefDayRacine(dayRacine, formatted);
-                    }
-
-                    if (calendarRef1.get(Calendar.DAY_OF_MONTH) >= day) {
-                        if (calendarRef1.get(Calendar.MONTH) + 1 >= month) {
-                            if (calendarRef1.get(Calendar.YEAR) >= year) {
-
-                                if ((calendarRef1.get(Calendar.DAY_OF_MONTH) == day) &&
-                                        (calendarRef1.get(Calendar.MONTH) + 1 == month) &&
-                                        (calendarRef1.get(Calendar.YEAR) == year)) {
-                                    bResult = true;
-                                }
-
-                                // stop
-                                break;
-                            }
-                        }
-                    }
-                }
-
-
-            } catch (ParseException e) {
-                Log.e(TAG, "Error parsing date for day racine reference", e);
-            }
-        }
-        dayRootCache.put(cacheKey, bResult);
-        return bResult;
+        return getCalculator().isDayRacine(year, month, day);
     }
 
     public boolean isDayFeuille(int year, int month, int day) {
-        int cacheKey = dayKey(year, month, day);
-        Boolean cachedResult = dayLeafCache.get(cacheKey);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        boolean bResult = false;
-
-        for (int dayFeuille = 0; dayFeuille < 10; dayFeuille++) {
-            String strDateRef1 = getLastRefDayFeuille(dayFeuille); // seulement le 1er pour l'instant
-
-            DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
-            try {
-                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
-                for (int i = 0; i < 26; i++) {
-
-                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
-                    Calendar calendarRef1 = Calendar.getInstance();
-                    calendarRef1.setTime(newDateRef1);
-
-                    // sauvegarder si date plus ancienne que le jour d'aujourdhui - 3 mois
-                    Date referenceDate = new Date();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(referenceDate);
-                    c.add(Calendar.MONTH, -3);
-                    if (c.after(calendarRef1)) {
-                        String formatted = dateFormatNodeRef.format(calendarRef1.getTime());
-                        saveLastRefDayFeuille(dayFeuille, formatted);
-                    }
-
-                    if (calendarRef1.get(Calendar.DAY_OF_MONTH) >= day) {
-                        if (calendarRef1.get(Calendar.MONTH) + 1 >= month) {
-                            if (calendarRef1.get(Calendar.YEAR) >= year) {
-
-                                if ((calendarRef1.get(Calendar.DAY_OF_MONTH) == day) &&
-                                        (calendarRef1.get(Calendar.MONTH) + 1 == month) &&
-                                        (calendarRef1.get(Calendar.YEAR) == year)) {
-                                    bResult = true;
-                                }
-
-                                // stop
-                                break;
-                            }
-                        }
-                    }
-                }
-
-
-            } catch (ParseException e) {
-                Log.e(TAG, "Error parsing date for day feuille reference", e);
-            }
-        }
-        dayLeafCache.put(cacheKey, bResult);
-        return bResult;
+        return getCalculator().isDayFeuille(year, month, day);
     }
 
     public boolean isDayFruit(int year, int month, int day) {
-        int cacheKey = dayKey(year, month, day);
-        Boolean cachedResult = dayFruitCache.get(cacheKey);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        boolean bResult = false;
-
-        for (int dayFruit = 0; dayFruit < 10; dayFruit++) {
-            String strDateRef1 = getLastRefDayFruit(dayFruit); // seulement le 1er pour l'instant
-
-            DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy");
-            try {
-                Date newDateRef1 = dateFormatNodeRef.parse(strDateRef1);// = (Date)addTime(dateNodeRef1, nodeType);
-                for (int m = 0; m < 26; m++) {
-
-                    newDateRef1 = addTime(newDateRef1, MOON_NODE_ASCENDING_NODE);
-                    Calendar calendarRef1 = Calendar.getInstance();
-                    calendarRef1.setTime(newDateRef1);
-
-                    // sauvegarder si date plus ancienne que le jour d'aujourdhui - 3 mois
-                    Date referenceDate = new Date();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(referenceDate);
-                    c.add(Calendar.MONTH, -3);
-                    if (c.after(calendarRef1)) {
-                        String formatted = dateFormatNodeRef.format(calendarRef1.getTime());
-                        saveLastRefDayFruit(dayFruit, formatted);
-                    }
-
-                    if (calendarRef1.get(Calendar.DAY_OF_MONTH) >= day) {
-                        if (calendarRef1.get(Calendar.MONTH) + 1 >= month) {
-                            if (calendarRef1.get(Calendar.YEAR) >= year) {
-
-                                if ((calendarRef1.get(Calendar.DAY_OF_MONTH) == day) &&
-                                        (calendarRef1.get(Calendar.MONTH) + 1 == month) &&
-                                        (calendarRef1.get(Calendar.YEAR) == year)) {
-                                    bResult = true;
-                                }
-
-                                // stop
-                                break;
-                            }
-                        }
-                    }
-                }
-
-
-            } catch (ParseException e) {
-                Log.e(TAG, "Error parsing date for day fruit reference", e);
-            }
-        }
-        dayFruitCache.put(cacheKey, bResult);
-        return bResult;
+        return getCalculator().isDayFruit(year, month, day);
     }
 
-    private boolean isMoonNode(int nodeType, int year, int month, int day) {
-        long cacheKey = moonNodeKey(nodeType, year, month, day);
-        Boolean cachedResult = moonNodeCache.get(cacheKey);
-        if (cachedResult != null) {
-            return cachedResult;
-        }
-
-        boolean bResult = false;
-        String strDateMoonNodeRef1 = getLastRefMoonNode(nodeType);
-
-        DateFormat dateFormatNodeRef = new SimpleDateFormat("d_M_yyyy_HH:mm:ss");
-        try {
-            Date newDateRef1 = dateFormatNodeRef.parse(strDateMoonNodeRef1);// = (Date)addTime(dateNodeRef1, nodeType);
-            for (int i = 0; i < 26; i++) {
-
-                newDateRef1 = addTime(newDateRef1, nodeType);
-                Calendar calendarRef1 = Calendar.getInstance();
-                calendarRef1.setTime(newDateRef1);
-
-                // sauvegarder si date plus ancienne que le jour d'aujourdhui - 3 mois
-                Date referenceDate = new Date();
-                Calendar c = Calendar.getInstance();
-                c.setTime(referenceDate);
-                c.add(Calendar.MONTH, -3);
-                if (c.after(calendarRef1)) {
-                    String formatted = dateFormatNodeRef.format(calendarRef1.getTime());
-                    saveLastRefMoonNode(nodeType, formatted);
-                }
-
-                if (calendarRef1.get(Calendar.DAY_OF_MONTH) >= day) {
-                    if (calendarRef1.get(Calendar.MONTH) + 1 >= month) {
-                        if (calendarRef1.get(Calendar.YEAR) >= year) {
-
-                            if ((calendarRef1.get(Calendar.DAY_OF_MONTH) == day) &&
-                                    (calendarRef1.get(Calendar.MONTH) + 1 == month) &&
-                                    (calendarRef1.get(Calendar.YEAR) == year)) {
-                                bResult = true;
-                            }
-                            // stop
-                            break;
-                        }
-                    }
-                }
-            }
-
-
-        } catch (ParseException e) {
-            Log.e(TAG, "Error parsing date for moon node reference", e);
-        }
-
-        moonNodeCache.put(cacheKey, bResult);
-        return bResult;
+    /** Retourne le contexte disponible (Fragment ou externe). */
+    private Context getSafeContext() {
+        if (mExternalContext != null) return mExternalContext;
+        if (mActivity != null) return mActivity.getApplicationContext();
+        Context ctx = getContext();
+        if (ctx != null) return ctx.getApplicationContext();
+        throw new IllegalStateException("Context is not available in FragmentCalendar");
     }
 
-    private static Date addTime(Date date, int nodeType) {
-        int days, hours, minutes, seconds;
-        switch (nodeType) {
-            case MOON_NODE_ASCENDING_NODE:
-            case MOON_NODE_DESCENDING_NODE:
-                //addTime(dateNodeRef1, 27, 5, 5, 36);
-                days = 27;
-                hours = 5;
-                minutes = 5;
-                seconds = 36;
-                break;
-            case MOON_NODE_APOGEE:
-            case MOON_NODE_PERIGEE:
-            default:
-                days = 27;
-                hours = 13;
-                minutes = 18;
-                seconds = 33;
-                break;
+    /** Retourne le calculateur lunaire, en le créant si nécessaire. */
+    private MoonDayCalculator getCalculator() {
+        if (mMoonDayCalculator == null) {
+            mMoonDayCalculator = new MoonDayCalculator(getSafeContext());
         }
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.add(Calendar.DATE, days);
-        cal.add(Calendar.HOUR, hours);
-        cal.add(Calendar.MINUTE, minutes);
-        cal.add(Calendar.SECOND, seconds);
-        return cal.getTime();
+        return mMoonDayCalculator;
     }
-
 
     private static final int[] IMAGE_LOOKUP = {
+
             R.drawable.moon0,
             R.drawable.moon1,
             R.drawable.moon2,

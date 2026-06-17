@@ -132,25 +132,25 @@ public class NotificationJobService extends JobService {
     }
 
     private ArrayList<ResultVegItem> getResultsForDate(Calendar dateToSurvey) {
-        FragmentCalendar fragmentCalendar = new FragmentCalendar();
-        fragmentCalendar.setExternalContext(getApplicationContext());
+        // Utilise MoonDayCalculator directement, sans passer par FragmentCalendar (anti-pattern supprimé)
+        MoonDayCalculator calculator = new MoonDayCalculator(getApplicationContext());
         ArrayList<ResultVegItem> resultArray = new ArrayList<>();
         ArrayList<ResultVegItem> collectArray;
 
-        int year = dateToSurvey.get(Calendar.YEAR);
+        int year  = dateToSurvey.get(Calendar.YEAR);
         int month = dateToSurvey.get(Calendar.MONTH);
-        int day = dateToSurvey.get(Calendar.DAY_OF_MONTH);
+        int day   = dateToSurvey.get(Calendar.DAY_OF_MONTH);
 
-        if (fragmentCalendar.isDayRacine(year, month + 1, day)) {
-            resultArray = RootVegManager.getResultVegForSow(getApplicationContext(), month);
+        if (calculator.isDayRacine(year, month + 1, day)) {
+            resultArray  = RootVegManager.getResultVegForSow(getApplicationContext(), month);
             collectArray = RootVegManager.getResultVegForCollect(getApplicationContext(), month);
             resultArray.addAll(collectArray);
-        } else if (fragmentCalendar.isDayFeuille(year, month + 1, day)) {
-            resultArray = LeafVegManager.getResultVegForSow(getApplicationContext(), month);
+        } else if (calculator.isDayFeuille(year, month + 1, day)) {
+            resultArray  = LeafVegManager.getResultVegForSow(getApplicationContext(), month);
             collectArray = LeafVegManager.getResultVegForCollect(getApplicationContext(), month);
             resultArray.addAll(collectArray);
-        } else if (fragmentCalendar.isDayFruit(year, month + 1, day)) {
-            resultArray = FruitVegManager.getResultVegForSow(getApplicationContext(), month);
+        } else if (calculator.isDayFruit(year, month + 1, day)) {
+            resultArray  = FruitVegManager.getResultVegForSow(getApplicationContext(), month);
             collectArray = FruitVegManager.getResultVegForCollect(getApplicationContext(), month);
             resultArray.addAll(collectArray);
         }
