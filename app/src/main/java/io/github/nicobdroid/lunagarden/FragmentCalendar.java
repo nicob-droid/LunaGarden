@@ -45,7 +45,6 @@ public class FragmentCalendar extends Fragment {
             };
 
     protected FragmentActivity mActivity;
-    private Context mExternalContext;
     /** Calculateur lunaire indépendant du Fragment. */
     private MoonDayCalculator mMoonDayCalculator;
 
@@ -100,12 +99,6 @@ public class FragmentCalendar extends Fragment {
         return fragment;
     }
 
-    public void setExternalContext(Context context) {
-        if (context != null) {
-            mExternalContext = context.getApplicationContext();
-            mMoonDayCalculator = new MoonDayCalculator(mExternalContext);
-        }
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,8 +192,11 @@ public class FragmentCalendar extends Fragment {
                 final MonthVegCache monthVegCache = new MonthVegCache(safeContext, mMonthId);
 
                 for (int day = 0; day < dayMax; day++) {
-                    DayComputation dayComputation = computeDayComputation(mYearId, mMonthId + 1, day + 1);
-                    appendDayVisualData(dayComputation, monthVegCache);
+                    appendDayVisualData(
+                            monthMoonData.specialTypes[day],
+                            monthMoonData.dayKinds[day],
+                            monthVegCache
+                    );
                 }
 
                 // code runs in a thread
@@ -262,8 +258,8 @@ public class FragmentCalendar extends Fragment {
         return computation;
     }
 
-    private void appendDayVisualData(DayComputation computation, MonthVegCache monthVegCache) {
-        switch (computation.specialType) {
+    private void appendDayVisualData(int specialType, int dayKind, MonthVegCache monthVegCache) {
+        switch (specialType) {
             case SPECIAL_ASCENDING:
                 mSowArray.add(R.drawable.ic_cancel);
                 mCollectArray.add(R.drawable.ic_cancel);
@@ -288,9 +284,9 @@ public class FragmentCalendar extends Fragment {
                 break;
         }
 
-        mSowArray.add(monthVegCache.getSowIconForDayKind(computation.dayKind));
-        mCollectArray.add(monthVegCache.getCollectIconForDayKind(computation.dayKind));
-        mActionArray.add(monthVegCache.getActionForDayKind(computation.dayKind));
+        mSowArray.add(monthVegCache.getSowIconForDayKind(dayKind));
+        mCollectArray.add(monthVegCache.getCollectIconForDayKind(dayKind));
+        mActionArray.add(monthVegCache.getActionForDayKind(dayKind));
     }
 
     private MonthMoonData getOrBuildMonthMoonData(int year, int month, SimpleDateFormat formatter) {
@@ -306,16 +302,23 @@ public class FragmentCalendar extends Fragment {
         int dayMax = date.getActualMaximum(Calendar.DAY_OF_MONTH);
         ArrayList<String> dateStrings = new ArrayList<>(dayMax);
         ArrayList<Integer> moonIcons = new ArrayList<>(dayMax);
+        int[] specialTypes = new int[dayMax];
+        int[] dayKinds = new int[dayMax];
 
         for (int day = 0; day < dayMax; day++) {
             double phase = computeMoonPhase(year, month + 1, day + 1);
             int phaseValue = ((int) Math.floor(phase)) % 30;
             dateStrings.add(formatter.format(date.getTime()));
             moonIcons.add(IMAGE_LOOKUP[phaseValue]);
+
+            DayComputation dayComputation = computeDayComputation(year, month + 1, day + 1);
+            specialTypes[day] = dayComputation.specialType;
+            dayKinds[day] = dayComputation.dayKind;
+
             date.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        MonthMoonData built = new MonthMoonData(dateStrings, moonIcons);
+        MonthMoonData built = new MonthMoonData(dateStrings, moonIcons, specialTypes, dayKinds);
         synchronized (MONTH_MOON_CACHE) {
             MONTH_MOON_CACHE.put(cacheKey, built);
         }
@@ -325,10 +328,14 @@ public class FragmentCalendar extends Fragment {
     private static final class MonthMoonData {
         final ArrayList<String> dateStrings;
         final ArrayList<Integer> moonIcons;
+        final int[] specialTypes;
+        final int[] dayKinds;
 
-        MonthMoonData(ArrayList<String> dateStrings, ArrayList<Integer> moonIcons) {
+        MonthMoonData(ArrayList<String> dateStrings, ArrayList<Integer> moonIcons, int[] specialTypes, int[] dayKinds) {
             this.dateStrings = dateStrings;
             this.moonIcons = moonIcons;
+            this.specialTypes = specialTypes;
+            this.dayKinds = dayKinds;
         }
     }
 
@@ -541,7 +548,6 @@ public class FragmentCalendar extends Fragment {
 
     /** Retourne le contexte disponible (Fragment ou externe). */
     private Context getSafeContext() {
-        if (mExternalContext != null) return mExternalContext;
         if (mActivity != null) return mActivity.getApplicationContext();
         Context ctx = getContext();
         if (ctx != null) return ctx.getApplicationContext();

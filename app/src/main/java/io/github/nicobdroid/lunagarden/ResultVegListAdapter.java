@@ -7,9 +7,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ResultVegListAdapter extends BaseAdapter {
+    private static final int COLOR_SOW = 0xFF00FF99;
+    private static final int COLOR_COLLECT = 0xFFFF9900;
+    private static final int COLOR_FORBIDDEN = 0xFFFF9999;
 
     // The ArrayList of Users<MessageItem>
     private ArrayList<ResultVegItem> mItemsList;
@@ -34,20 +36,15 @@ public class ResultVegListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (mItemsList != null) {
-            return mItemsList.size();
-        } else {
-            return 0;
-        }
+        return mItemsList != null ? mItemsList.size() : 0;
     }
 
     @Override
     public ResultVegItem getItem(int position) {
-        ResultVegItem item = null;
-        if (mItemsList != null && !mItemsList.isEmpty()) {
-            item = mItemsList.get(position);
+        if (mItemsList == null || position < 0 || position >= mItemsList.size()) {
+            return null;
         }
-        return item;
+        return mItemsList.get(position);
     }
 
     @Override
@@ -83,12 +80,18 @@ public class ResultVegListAdapter extends BaseAdapter {
                     mContext.getString(R.string.a11y_result_image_named, item.getMainMessage())
             );
 
-            if (item.getAction() == ResultVegItem.RESULT_VEG_ITEM_SOW) {
-                Objects.requireNonNull(viewHolder).header_textview.setTextColor(0xFF00FF99);
-            } else if (item.getAction() == ResultVegItem.RESULT_VEG_ITEM_COLLECT){
-                Objects.requireNonNull(viewHolder).header_textview.setTextColor(0xFFFF9900);
-            } else if (item.getAction() == ResultVegItem.RESULT_VEG_ITEM_FORBIDDEN) {
-                Objects.requireNonNull(viewHolder).header_textview.setTextColor(0xFFFF9999);
+            switch (item.getAction()) {
+                case ResultVegItem.RESULT_VEG_ITEM_SOW:
+                    viewHolder.header_textview.setTextColor(COLOR_SOW);
+                    break;
+                case ResultVegItem.RESULT_VEG_ITEM_COLLECT:
+                    viewHolder.header_textview.setTextColor(COLOR_COLLECT);
+                    break;
+                case ResultVegItem.RESULT_VEG_ITEM_FORBIDDEN:
+                    viewHolder.header_textview.setTextColor(COLOR_FORBIDDEN);
+                    break;
+                default:
+                    break;
             }
         }
 

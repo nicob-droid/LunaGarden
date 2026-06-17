@@ -45,12 +45,20 @@ public class CalendarAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewGroup vg;
+        View view = convertView;
+        ViewHolder holder;
 
-        if (convertView != null) {
-            vg = (ViewGroup) convertView;
+        if (view == null) {
+            view = inflater.inflate(R.layout.calendar_element, parent, false);
+            holder = new ViewHolder();
+            holder.tvDate = view.findViewById(R.id.date);
+            holder.tvAction = view.findViewById(R.id.resume);
+            holder.ivMoon = view.findViewById(R.id.moon);
+            holder.ivWork = view.findViewById(R.id.semis);
+            holder.ivCollect = view.findViewById(R.id.collects);
+            view.setTag(holder);
         } else {
-            vg = (ViewGroup) inflater.inflate(R.layout.calendar_element, parent, false);
+            holder = (ViewHolder) view.getTag();
         }
 
         String date = dates.get(position);
@@ -58,23 +66,24 @@ public class CalendarAdapter extends BaseAdapter {
         int iMoon = moons.get(position);
         int iWork = semis.get(position);
         int iCollect = collects.get(position);
-    //    String strAction = actions.get(position);
-        final TextView tvDate =  vg.findViewById(R.id.date);
-        final TextView tvAction = vg.findViewById(R.id.resume);
-        final ImageView ivMoon = vg.findViewById(R.id.moon);
-        final ImageView ivWork = vg.findViewById(R.id.semis);
-        final ImageView ivCollect = vg.findViewById(R.id.collects);
+        holder.ivMoon.setImageResource(iMoon);
+        holder.ivWork.setImageResource(iWork);
+        holder.tvDate.setText(date);
+        holder.tvAction.setText(action);
+        holder.ivCollect.setImageResource(iCollect);
+        holder.ivMoon.setContentDescription(context.getString(R.string.a11y_moon_phase_for_date, date));
+        holder.ivWork.setContentDescription(context.getString(R.string.a11y_sowing_for_date, date));
+        holder.ivCollect.setContentDescription(context.getString(R.string.a11y_harvest_for_date, date));
 
-        ivMoon.setImageResource(iMoon);
-        ivWork.setImageResource(iWork);
-        tvDate.setText(date);
-        tvAction.setText(action);
-        ivCollect.setImageResource(iCollect);
-        ivMoon.setContentDescription(context.getString(R.string.a11y_moon_phase_for_date, date));
-        ivWork.setContentDescription(context.getString(R.string.a11y_sowing_for_date, date));
-        ivCollect.setContentDescription(context.getString(R.string.a11y_harvest_for_date, date));
+        return view;
+    }
 
-        return vg;
+    private static final class ViewHolder {
+        TextView tvDate;
+        TextView tvAction;
+        ImageView ivMoon;
+        ImageView ivWork;
+        ImageView ivCollect;
     }
 }
 
