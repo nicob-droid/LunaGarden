@@ -166,7 +166,6 @@ public class LeafVegManager {
         int itemCount = getItemCount(titles, sowMessages);
 
         ArrayList<ResultVegItem> result = new ArrayList<>();
-        result.clear();
 
         LeafVegPrefs leafVegPrefs = new LeafVegPrefs(context);
         for (int i = 0; i < itemCount; i++) {

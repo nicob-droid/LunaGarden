@@ -9,34 +9,27 @@ import io.github.nicobdroid.lunagarden.AppTechnicalKeys;
 import io.github.nicobdroid.lunagarden.R;
 
 public class LeafVegPrefs {
-    private static final String TAG = "LeafVegPrefs";
     private final Context mContext;
     private final SharedPreferences mPrefs;
 
-
-    // constructor
     public LeafVegPrefs(Context context) {
         this.mContext = context;
         this.mPrefs = context.getSharedPreferences(context.getString(R.string.sharedpref_leaf_veg), MODE_PRIVATE);
     }
 
-
     public void saveLeafVegEnable(String strValue) {
-        //Log.i(TAG, "Save Leaf Veg Enable: " + strValue);
-        SharedPreferences.Editor editor = this.mPrefs.edit();
-        editor.putString(mContext.getString(R.string.settings_leaf_veg_enable), strValue);
-        editor.apply();
+        putString(mContext.getString(R.string.settings_leaf_veg_enable), strValue);
     }
 
     public void saveItem(String itemName, String itemValue) {
-        //Log.i(TAG, "Save Item: " + itemName + " = " + itemValue);
-        SharedPreferences.Editor editor = this.mPrefs.edit();
-        editor.putString(itemName, itemValue);
-        editor.apply();
+        putString(itemName, itemValue);
     }
 
     public String readLeafVegEnable() {
-        return getSharedPreferenceString(mContext.getString(R.string.settings_leaf_veg_enable), mContext.getString(R.string.default_leaf_veg_enable));
+        return getSharedPreferenceString(
+                mContext.getString(R.string.settings_leaf_veg_enable),
+                mContext.getString(R.string.default_leaf_veg_enable)
+        );
     }
 
     public String readItemEnable(String itemName) {
@@ -44,55 +37,28 @@ public class LeafVegPrefs {
     }
 
     public String readItemEnable(String itemKey, String legacyItemName) {
-        if (isSharedPreferenceAvailable(itemKey)) {
-            return getSharedPreferenceString(itemKey, mContext.getString(R.string.default_leaf_veg_item));
+        String value = mPrefs.getString(itemKey, null);
+        if (value != null) {
+            return value;
         }
         return readItemEnable(legacyItemName);
     }
 
-    public boolean isItemEnabled(String itemName) {
-        boolean bResult = true;
-        String str = readItemEnable(itemName);
-        if (str.contains("false")) {
-            bResult = false;
-        }
-        return bResult;
-    }
 
     public boolean isItemEnabled(String itemKey, String legacyItemName) {
         return !readItemEnable(itemKey, legacyItemName).contains("false");
     }
 
     public boolean isLeafVegEnabled() {
-        boolean bResult = true;
-        String str = readLeafVegEnable();
-        if (str.contains(AppTechnicalKeys.PREF_VALUE_NO)) {
-            bResult = false;
-        }
-        return bResult;
+        return !readLeafVegEnable().contains(AppTechnicalKeys.PREF_VALUE_NO);
     }
 
-
-    private String getSharedPreferenceString(String strTest, String defValue) {
-        String iValue = defValue;
-
-        if (isSharedPreferenceAvailable(strTest)) {
-            iValue = mPrefs.getString(strTest, defValue);
-        }
-
-        return iValue;
+    private void putString(String key, String value) {
+        mPrefs.edit().putString(key, value).apply();
     }
 
-    private boolean isSharedPreferenceAvailable(String sharedPref) {
-        boolean bResult = false;
-        String strPreference;
-
-        strPreference = sharedPref;
-
-        if (mPrefs.contains(strPreference)) {
-            bResult = true;
-        }
-        return bResult;
+    private String getSharedPreferenceString(String key, String defValue) {
+        return mPrefs.getString(key, defValue);
     }
 
 }

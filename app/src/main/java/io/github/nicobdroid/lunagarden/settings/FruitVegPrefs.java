@@ -13,8 +13,6 @@ public class FruitVegPrefs {
     private final Context mContext;
     private final SharedPreferences mPrefs;
 
-
-    // constructor
     public FruitVegPrefs(Context context) {
         this.mContext = context;
         this.mPrefs = context.getSharedPreferences(context.getString(R.string.sharedpref_fruit_veg), MODE_PRIVATE);
@@ -22,36 +20,30 @@ public class FruitVegPrefs {
 
     public void saveSettingsDone() {
         Log.i(TAG, "Save Settings Done");
-        SharedPreferences.Editor editor = this.mPrefs.edit();
-        editor.putString(mContext.getString(R.string.settings_done), mContext.getString(R.string.settings_done));
-        editor.apply();
+        putString(mContext.getString(R.string.settings_done), mContext.getString(R.string.settings_done));
     }
 
     public boolean areSettingsDone() {
-        boolean bResult = false;
-        String str = getSharedPreferenceString(mContext.getString(R.string.settings_done), mContext.getString(R.string.default_leaf_veg_item));
-        if (str.contains(mContext.getString(R.string.settings_done))) {
-            bResult = true;
-        }
-        return bResult;
+        String value = getSharedPreferenceString(
+                mContext.getString(R.string.settings_done),
+                mContext.getString(R.string.default_leaf_veg_item)
+        );
+        return value.contains(mContext.getString(R.string.settings_done));
     }
 
     public void saveFruitVegEnable(String strValue) {
-        //Log.i(TAG, "Save Fruit Veg Enable: " + strValue);
-        SharedPreferences.Editor editor = this.mPrefs.edit();
-        editor.putString(mContext.getString(R.string.settings_fruit_veg_enable), strValue);
-        editor.apply();
+        putString(mContext.getString(R.string.settings_fruit_veg_enable), strValue);
     }
 
     public void saveItem(String itemName, String itemValue) {
-        //Log.i(TAG, "Save Item: " + itemName + " = " + itemValue);
-        SharedPreferences.Editor editor = this.mPrefs.edit();
-        editor.putString(itemName, itemValue);
-        editor.apply();
+        putString(itemName, itemValue);
     }
 
     public String readFruitVegEnable() {
-        return getSharedPreferenceString(mContext.getString(R.string.settings_fruit_veg_enable), mContext.getString(R.string.default_fruit_veg_enable));
+        return getSharedPreferenceString(
+                mContext.getString(R.string.settings_fruit_veg_enable),
+                mContext.getString(R.string.default_fruit_veg_enable)
+        );
     }
 
     public String readItemEnable(String itemName) {
@@ -59,8 +51,9 @@ public class FruitVegPrefs {
     }
 
     public String readItemEnable(String itemKey, String legacyItemName) {
-        if (isSharedPreferenceAvailable(itemKey)) {
-            return getSharedPreferenceString(itemKey, mContext.getString(R.string.default_fruit_veg_item));
+        String value = mPrefs.getString(itemKey, null);
+        if (value != null) {
+            return value;
         }
         return readItemEnable(legacyItemName);
     }
@@ -70,35 +63,15 @@ public class FruitVegPrefs {
     }
 
     public boolean isFruitVegEnabled() {
-        boolean bResult = true;
-        String str = readFruitVegEnable();
-        if (str.contains(AppTechnicalKeys.PREF_VALUE_NO)) {
-            bResult = false;
-        }
-        return bResult;
+        return !readFruitVegEnable().contains(AppTechnicalKeys.PREF_VALUE_NO);
     }
 
-
-    private String getSharedPreferenceString(String strTest, String defValue) {
-        String iValue = defValue;
-
-        if (isSharedPreferenceAvailable(strTest)) {
-            iValue = mPrefs.getString(strTest, defValue);
-        }
-
-        return iValue;
+    private void putString(String key, String value) {
+        mPrefs.edit().putString(key, value).apply();
     }
 
-    private boolean isSharedPreferenceAvailable(String sharedPref) {
-        boolean bResult = false;
-        String strPreference;
-
-        strPreference = sharedPref;
-
-        if (mPrefs.contains(strPreference)) {
-            bResult = true;
-        }
-        return bResult;
+    private String getSharedPreferenceString(String key, String defValue) {
+        return mPrefs.getString(key, defValue);
     }
 
 }
