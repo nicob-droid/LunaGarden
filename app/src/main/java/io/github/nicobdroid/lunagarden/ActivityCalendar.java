@@ -96,54 +96,39 @@ public class ActivityCalendar extends AppCompatActivity {
         // Returns the fragment to display for a particular page.
         @Override
         public Fragment getItem(int position) {
-
-            int iNewYear = actualYear;
-            int iNewMonth = actualMonth;
-
             switch (position) {
                 case 0:
-                    if (actualMonth < 2) {
-                        iNewYear = actualYear - 1;
-                        iNewMonth = actualMonth + 10;
-                    } else {
-                        iNewMonth = actualMonth - 2;
-                    }
-                    return FragmentCalendar.newInstance(iNewMonth, iNewYear);
+                    return createFragmentForOffset(-2);
                 case 1:
-                    if (actualMonth < 1) {
-                        iNewYear = actualYear - 1;
-                        iNewMonth = actualMonth + 11;
-                    } else {
-                        iNewMonth = actualMonth - 1;
-                    }
-                    return FragmentCalendar.newInstance(iNewMonth, iNewYear);
+                    return createFragmentForOffset(-1);
                 case 2:
-                    return FragmentCalendar.newInstance(actualMonth, actualYear);
+                    return createFragmentForOffset(0);
                 case 3:
-                    if (actualMonth > 10) {
-                        iNewYear = actualYear + 1;
-                    }
-                    return FragmentCalendar.newInstance(actualMonth + 1, iNewYear);
+                    return createFragmentForOffset(1);
                 case 4:
-                    if (actualMonth > 9) {
-                        iNewYear = actualYear + 1;
-                    }
-                    return FragmentCalendar.newInstance(actualMonth + 2, iNewYear);
+                    return createFragmentForOffset(2);
                 case 5:
-                    if (actualMonth > 8) {
-                        iNewYear = actualYear + 1;
-                    }
-                    return FragmentCalendar.newInstance(actualMonth + 3, iNewYear);
+                    return createFragmentForOffset(3);
                 default:
                     return null;
             }
+        }
+
+        private Fragment createFragmentForOffset(int monthOffset) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(actualYear, actualMonth, 1);
+            calendar.add(Calendar.MONTH, monthOffset);
+            return FragmentCalendar.newInstance(calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         }
 
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
             String strPageTitle = null;
-            int monthId = (12 + position + actualMonth - 2)%12;
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(actualYear, actualMonth, 1);
+            calendar.add(Calendar.MONTH, position - 2);
+            int monthId = calendar.get(Calendar.MONTH);
             switch (monthId) {
                 case Calendar.JANUARY:
                     strPageTitle = mContext.getString(R.string.january);
@@ -186,14 +171,7 @@ public class ActivityCalendar extends AppCompatActivity {
 
             }
 
-            if ((position + actualMonth - 2) > Calendar.DECEMBER) {
-                strPageTitle += " " + (actualYear + 1);
-            } else if ((position + actualMonth - 2) < Calendar.JANUARY) {
-                strPageTitle += " " + (actualYear - 1);
-            }
-            else {
-                strPageTitle += " " + actualYear;
-            }
+            strPageTitle += " " + calendar.get(Calendar.YEAR);
 
             return strPageTitle;
         }
