@@ -21,6 +21,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import io.github.nicobdroid.lunagarden.settings.FruitVegManager;
 import io.github.nicobdroid.lunagarden.settings.FruitVegPrefs;
@@ -31,21 +34,25 @@ import io.github.nicobdroid.lunagarden.settings.RootVegPrefs;
 
 public class FragmentCalendar extends Fragment {
     public static final String TAG = "FragmentCalendar";
+    private static final int MAX_MONTH_MOON_CACHE_ENTRIES = 36;
+
+    private static final Map<String, MonthMoonData> MONTH_MOON_CACHE =
+            new LinkedHashMap<>(MAX_MONTH_MOON_CACHE_ENTRIES, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, MonthMoonData> eldest) {
+                    return size() > MAX_MONTH_MOON_CACHE_ENTRIES;
+                }
+            };
 
     protected FragmentActivity mActivity;
     private Context mExternalContext;
     /** Calculateur lunaire indépendant du Fragment. */
     private MoonDayCalculator mMoonDayCalculator;
 
-    private static final double MOON_PHASE_LENGTH = 29.530588853;
     private ListView listView;
     private TextView pleaseWait;
     private RelativeLayout mainLayout;
     private CalendarAdapter calendarAdapter;
-    private static final int MOON_NODE_ASCENDING_NODE = 0;
-    private static final int MOON_NODE_DESCENDING_NODE = 1;
-    private static final int MOON_NODE_APOGEE = 2;
-    private static final int MOON_NODE_PERIGEE = 3;
     private static final int DAY_KIND_NONE = 0;
     private static final int DAY_KIND_ROOT = 1;
     private static final int DAY_KIND_LEAF = 2;
@@ -176,43 +183,24 @@ public class FragmentCalendar extends Fragment {
                     pleaseWait.setVisibility(View.VISIBLE);
                 });
 
-                final SimpleDateFormat curFormater = new SimpleDateFormat("MMM dd");
-                final GregorianCalendar date = new GregorianCalendar();
-
-
-                mDateStringArray = new ArrayList<>();
-                mMoonArray = new ArrayList<>();
-                mSowArray = new ArrayList<>();
-                mCollectArray = new ArrayList<>();
-                mActionArray = new ArrayList<>();
-
-                mResultArray = new ArrayList<>();
-                final MonthVegCache monthVegCache = new MonthVegCache(safeContext, mMonthId);
-
-                date.set(Calendar.YEAR, mYearId);
-                date.set(Calendar.MONTH, mMonthId);
-                date.set(Calendar.DAY_OF_MONTH, 1);
+                final SimpleDateFormat curFormater = new SimpleDateFormat("MMM dd", Locale.getDefault());
+                final GregorianCalendar date = new GregorianCalendar(mYearId, mMonthId, 1);
                 final int dayMax = date.getActualMaximum(Calendar.DAY_OF_MONTH);
 
+                MonthMoonData monthMoonData = getOrBuildMonthMoonData(mYearId, mMonthId, curFormater);
+
+                mDateStringArray = new ArrayList<>(monthMoonData.dateStrings);
+                mMoonArray = new ArrayList<>(monthMoonData.moonIcons);
+                mSowArray = new ArrayList<>(dayMax);
+                mCollectArray = new ArrayList<>(dayMax);
+                mActionArray = new ArrayList<>(dayMax);
+
+                mResultArray = new ArrayList<>(4);
+                final MonthVegCache monthVegCache = new MonthVegCache(safeContext, mMonthId);
+
                 for (int day = 0; day < dayMax; day++) {
-                    double phase = computeMoonPhase(date.get(Calendar.YEAR), mMonthId + 1, day + 1);
-                    //Log.i(TAG, "Computed moon phase: " + phase);
-
-                    int phaseValue = ((int) Math.floor(phase)) % 30;
-                    //Log.i(TAG, "Discrete phase value: " + phaseValue);
-
-                    mDateStringArray.add(curFormater.format(date.getTime()));
-
-                    mMoonArray.add(IMAGE_LOOKUP[phaseValue]);
-
-                    DayComputation dayComputation = computeDayComputation(
-                            date.get(Calendar.YEAR),
-                            mMonthId + 1,
-                            day + 1
-                    );
+                    DayComputation dayComputation = computeDayComputation(mYearId, mMonthId + 1, day + 1);
                     appendDayVisualData(dayComputation, monthVegCache);
-
-                    date.add(Calendar.DAY_OF_MONTH, 1);
                 }
 
                 // code runs in a thread
@@ -303,6 +291,45 @@ public class FragmentCalendar extends Fragment {
         mSowArray.add(monthVegCache.getSowIconForDayKind(computation.dayKind));
         mCollectArray.add(monthVegCache.getCollectIconForDayKind(computation.dayKind));
         mActionArray.add(monthVegCache.getActionForDayKind(computation.dayKind));
+    }
+
+    private MonthMoonData getOrBuildMonthMoonData(int year, int month, SimpleDateFormat formatter) {
+        String cacheKey = year + "-" + month + "-" + Locale.getDefault().toLanguageTag();
+        synchronized (MONTH_MOON_CACHE) {
+            MonthMoonData cached = MONTH_MOON_CACHE.get(cacheKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
+        GregorianCalendar date = new GregorianCalendar(year, month, 1);
+        int dayMax = date.getActualMaximum(Calendar.DAY_OF_MONTH);
+        ArrayList<String> dateStrings = new ArrayList<>(dayMax);
+        ArrayList<Integer> moonIcons = new ArrayList<>(dayMax);
+
+        for (int day = 0; day < dayMax; day++) {
+            double phase = computeMoonPhase(year, month + 1, day + 1);
+            int phaseValue = ((int) Math.floor(phase)) % 30;
+            dateStrings.add(formatter.format(date.getTime()));
+            moonIcons.add(IMAGE_LOOKUP[phaseValue]);
+            date.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        MonthMoonData built = new MonthMoonData(dateStrings, moonIcons);
+        synchronized (MONTH_MOON_CACHE) {
+            MONTH_MOON_CACHE.put(cacheKey, built);
+        }
+        return built;
+    }
+
+    private static final class MonthMoonData {
+        final ArrayList<String> dateStrings;
+        final ArrayList<Integer> moonIcons;
+
+        MonthMoonData(ArrayList<String> dateStrings, ArrayList<Integer> moonIcons) {
+            this.dateStrings = dateStrings;
+            this.moonIcons = moonIcons;
+        }
     }
 
     private static final class MonthVegCache {
