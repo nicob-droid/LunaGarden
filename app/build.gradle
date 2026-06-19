@@ -6,6 +6,13 @@ def versionPatch = (project.findProperty('VERSION_PATCH') ?: '0').toInteger()
 def computedVersionCode = (versionMajor * 10000) + (versionMinor * 100) + versionPatch
 def computedVersionName = "${versionMajor}.${versionMinor}.${versionPatch}"
 
+// Load signing config from local.properties (never commit these values to VCS)
+def localProps = new Properties()
+def localPropsFile = rootProject.file('local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+
 android {
     namespace = "io.github.nicobdroid.lunagarden"
     compileSdk = 36
@@ -17,10 +24,21 @@ android {
         versionName computedVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile     localProps['KEYSTORE_PATH'] ? file(localProps['KEYSTORE_PATH']) : null
+            storePassword localProps['KEYSTORE_PASSWORD'] ?: ''
+            keyAlias      localProps['KEY_ALIAS']         ?: ''
+            keyPassword   localProps['KEY_PASSWORD']      ?: ''
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            signingConfig    signingConfigs.release
+            minifyEnabled    true
+            shrinkResources  true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
