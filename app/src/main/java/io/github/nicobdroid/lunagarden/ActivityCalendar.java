@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -30,6 +30,8 @@ public class ActivityCalendar extends AppCompatActivity {
     FragmentPagerAdapter adapterViewPager;
     private AdView adView;
     private int adRetryCount;
+    private final Handler adRetryHandler = new Handler(Looper.getMainLooper());
+    private Runnable adRetryRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,25 +49,25 @@ public class ActivityCalendar extends AppCompatActivity {
                 @Override
                 public void onAdLoaded() {
                     adRetryCount = 0;
+                    if (adView != null) adView.setVisibility(View.VISIBLE);
                     Log.d(TAG, "AdMob banner loaded");
                 }
 
                 @Override
                 public void onAdFailedToLoad(LoadAdError loadAdError) {
                     Log.w(TAG, "AdMob banner failed: " + loadAdError.getCode() + " / " + loadAdError.getMessage());
-                    if ((getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-                        Toast.makeText(
-                                ActivityCalendar.this,
-                                "AdMob error " + loadAdError.getCode() + ": " + loadAdError.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show();
-                    }
-                    if (adRetryCount < MAX_AD_RETRY) {
-                        adRetryCount++;
-                        new Handler(Looper.getMainLooper()).postDelayed(
-                                () -> adView.loadAd(new AdRequest.Builder().build()),
-                                AD_RETRY_DELAY_MS
-                        );
+                    if (!isFinishing() && !isDestroyed()) {
+                        if (adRetryCount < MAX_AD_RETRY) {
+                            adRetryCount++;
+                            adRetryRunnable = () -> {
+                                if (adView != null && !isFinishing() && !isDestroyed()) {
+                                    adView.loadAd(new AdRequest.Builder().build());
+                                }
+                            };
+                            adRetryHandler.postDelayed(adRetryRunnable, AD_RETRY_DELAY_MS);
+                        } else {
+                            if (adView != null) adView.setVisibility(View.GONE);
+                        }
                     }
                 }
             });
@@ -197,8 +199,10 @@ public class ActivityCalendar extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        adRetryHandler.removeCallbacksAndMessages(null);
         if (adView != null) {
             adView.destroy();
+            adView = null;
         }
         super.onDestroy();
     }
