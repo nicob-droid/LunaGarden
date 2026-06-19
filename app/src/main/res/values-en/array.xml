@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="appearance_mode_entries">
+        <item>System</item>
+        <item>Light mode</item>
+        <item>Dark mode</item>
+    </string-array>
+
     <string-array name="fruit_veg_titles">
         <item>Eggplant</item>
         <item>Cucumber</item>

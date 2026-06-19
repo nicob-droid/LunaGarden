@@ -65,7 +65,9 @@
     <string name="reconfiguration_message">You can reconfigure your ideal garden vegetables at any time.</string>
     <string name="settings_appearance_title">Appearance mode</string>
     <string name="settings_appearance_summary">Choose the app appearance</string>
+    <string name="notification_time_title">Notification time</string>
     <string name="notification_time_message">Set the notification time to be informed of any action to perform in your garden.</string>
+    <string name="notification_days_earlier_title">Notify 0, 1, or several days in advance</string>
     <string name="notification_days_earlier_message">You can receive a notification one or more days in advance to better organize your ideal garden.</string>
     <plurals name="notification_days_earlier_current_value">
         <item quantity="one">Current: %1$d day earlier</item>

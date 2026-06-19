@@ -29,7 +29,7 @@
 
         <io.github.nicobdroid.lunagarden.TimePreference
             android:icon="@drawable/chou_pomme_printemps"
-            android:title="Heure fixe de notification"
+            android:title="@string/notification_time_title"
             android:key="@string/settings_notification_time"
             android:summary="@string/notification_time_message"
             android:defaultValue="10:00"
@@ -40,7 +40,7 @@
             android:defaultValue="0"
             android:key="@string/settings_notification_nb_days_earlier"
             android:summary="@string/notification_days_earlier_message"
-            android:title="Notifier 0, 1 ou plusieurs jours à l'avance" />
+            android:title="@string/notification_days_earlier_title" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/legal_information_category_title">

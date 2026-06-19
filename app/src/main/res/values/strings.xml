@@ -67,7 +67,9 @@
     <string name="settings_appearance_mode" translatable="false">settings_appearance_mode</string>
     <string name="settings_appearance_title">Mode d\'apparence</string>
     <string name="settings_appearance_summary">Choisir l\'apparence de l\'application</string>
+    <string name="notification_time_title">Heure de notification</string>
     <string name="notification_time_message">Spécifier l\'heure de notification pour être prévenu d\'une eventuelle action à effectuer dans votre jardin.</string>
+    <string name="notification_days_earlier_title">Notifier 0, 1 ou plusieurs jours à l\'avance</string>
     <string name="notification_days_earlier_message">Il est possible de recevoir une notification avec un ou plusieurs jours à l\'avance pour optimiser l\'organisation de votre jardin idéal.</string>
     <plurals name="notification_days_earlier_current_value">
         <item quantity="one">Actuellement : %1$d jour d\'avance</item>
