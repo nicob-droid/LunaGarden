@@ -103,8 +103,7 @@ public class RootVegManager {
      */
     public static ArrayList<VegItem> getFruitItemList(Context context) {
         String[] titles = getTitles(context);
-        String[] messages = getMessages(context);
-        int itemCount = getItemCount(titles, messages);
+        int itemCount = getItemCount(titles);
 
         ArrayList<VegItem> list = new ArrayList<>();
         RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
@@ -112,7 +111,7 @@ public class RootVegManager {
             VegItem item = new VegItem();
             item.setPreferenceKey(ITEM_KEYS[i]);
             item.setFruitname(titles[i]);
-            item.setMessage(messages[i]);
+            item.setMessage(titles[i]);
             item.setPictureResId(pictures[i]);
             item.setCheckboxChecked(Boolean.parseBoolean(rootVegPrefs.readItemEnable(ITEM_KEYS[i], titles[i])));
             list.add(item);
@@ -143,8 +142,8 @@ public class RootVegManager {
 
     public static ArrayList<ResultVegItem> getResultVegForSow(Context context, int month) {
         String[] titles = getTitles(context);
-        String[] sowMessages = getSowMessages(context);
-        int itemCount = getItemCount(titles, sowMessages);
+        int itemCount = getItemCount(titles);
+        String sowPeriodLabel = "Periode de semis";
 
         ArrayList<ResultVegItem> result = new ArrayList<>();
         RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
@@ -154,7 +153,7 @@ public class RootVegManager {
                     ResultVegItem item = new ResultVegItem();
                     String strMainMessage = context.getString(R.string.action_sow_format, titles[i].toUpperCase());
                     item.setMainMessage(strMainMessage);
-                    item.setSubMessage(sowMessages[i]);
+                    item.setSubMessage(sowPeriodLabel);
                     item.setPictureResId(pictures[i]);
                     item.setAction(ResultVegItem.RESULT_VEG_ITEM_SOW);
                     result.add(item);
@@ -166,8 +165,8 @@ public class RootVegManager {
 
     public static ArrayList<ResultVegItem> getResultVegForCollect(Context context, int month) {
         String[] titles = getTitles(context);
-        String[] collectMessages = getCollectMessages(context);
-        int itemCount = getItemCount(titles, collectMessages);
+        int itemCount = getItemCount(titles);
+        String collectPeriodLabel = "Periode de recolte";
 
         ArrayList<ResultVegItem> result = new ArrayList<>();
         RootVegPrefs rootVegPrefs = new RootVegPrefs(context);
@@ -177,7 +176,7 @@ public class RootVegManager {
                     ResultVegItem item = new ResultVegItem();
                     String strMainMessage = context.getString(R.string.action_collect_format, titles[i].toUpperCase());
                     item.setMainMessage(strMainMessage);
-                    item.setSubMessage(collectMessages[i]);
+                    item.setSubMessage(collectPeriodLabel);
                     item.setPictureResId(pictures[i]);
                     item.setAction(ResultVegItem.RESULT_VEG_ITEM_COLLECT);
                     result.add(item);
@@ -255,17 +254,7 @@ public class RootVegManager {
         return context.getResources().getStringArray(R.array.root_veg_titles);
     }
 
-    private static String[] getMessages(Context context) {
-        return context.getResources().getStringArray(R.array.root_veg_messages);
-    }
 
-    private static String[] getSowMessages(Context context) {
-        return context.getResources().getStringArray(R.array.root_veg_sow_messages);
-    }
-
-    private static String[] getCollectMessages(Context context) {
-        return context.getResources().getStringArray(R.array.root_veg_collect_messages);
-    }
 
     private static int getItemCount(String[]... arrays) {
         int expected = ITEM_KEYS.length;
