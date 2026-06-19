@@ -54,6 +54,7 @@ public class MyPreferenceActivity extends AppCompatActivity {
             bindNotificationPreferenceListener(getString(R.string.settings_notification_time));
             bindNotificationPreferenceListener(getString(R.string.settings_notification_nb_days_earlier));
             bindAppearancePreferenceListener();
+            bindSimpleListSummaryProvider(getString(R.string.settings_calendar_months_ahead));
 
         }
 
@@ -71,6 +72,14 @@ public class MyPreferenceActivity extends AppCompatActivity {
                 }
                 return true;
             });
+        }
+
+        private void bindSimpleListSummaryProvider(String key) {
+            ListPreference preference = findPreference(key);
+            if (preference == null) {
+                return;
+            }
+            preference.setSummaryProvider(ListPreference.SimpleSummaryProvider.getInstance());
         }
 
         private void bindNotificationPreferenceListener(String key) {

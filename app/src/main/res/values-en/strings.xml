@@ -69,6 +69,8 @@
     <string name="notification_time_message">Set the notification time to be informed of any action to perform in your garden.</string>
     <string name="notification_days_earlier_title">Notify 0, 1, or several days in advance</string>
     <string name="notification_days_earlier_message">You can receive a notification one or more days in advance to better organize your ideal garden.</string>
+    <string name="calendar_months_ahead_title">Months shown ahead</string>
+    <string name="calendar_months_ahead_summary">Choose how many future months are visible in the calendar (from 1 to 12).</string>
     <plurals name="notification_days_earlier_current_value">
         <item quantity="one">Current: %1$d day earlier</item>
         <item quantity="other">Current: %1$d days earlier</item>

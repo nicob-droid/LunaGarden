@@ -19,6 +19,15 @@
             android:entries="@array/appearance_mode_entries"
             android:entryValues="@array/appearance_mode_values"
             android:defaultValue="system" />
+
+        <ListPreference
+            android:icon="@drawable/ail_blanc"
+            android:key="@string/settings_calendar_months_ahead"
+            android:title="@string/calendar_months_ahead_title"
+            android:summary="@string/calendar_months_ahead_summary"
+            android:entries="@array/calendar_months_ahead_entries"
+            android:entryValues="@array/calendar_months_ahead_values"
+            android:defaultValue="3" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Notifications">

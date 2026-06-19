@@ -71,6 +71,8 @@
     <string name="notification_time_message">Spécifier l\'heure de notification pour être prévenu d\'une eventuelle action à effectuer dans votre jardin.</string>
     <string name="notification_days_earlier_title">Notifier 0, 1 ou plusieurs jours à l\'avance</string>
     <string name="notification_days_earlier_message">Il est possible de recevoir une notification avec un ou plusieurs jours à l\'avance pour optimiser l\'organisation de votre jardin idéal.</string>
+    <string name="calendar_months_ahead_title">Mois affichés à l\'avance</string>
+    <string name="calendar_months_ahead_summary">Choisir le nombre de mois futurs visibles dans le calendrier (de 1 à 12).</string>
     <plurals name="notification_days_earlier_current_value">
         <item quantity="one">Actuellement : %1$d jour d\'avance</item>
         <item quantity="other">Actuellement : %1$d jours d\'avance</item>

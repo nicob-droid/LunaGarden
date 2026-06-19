@@ -12,6 +12,7 @@
     <string name="settings_notification_enable" translatable="false">settings_notification_enable</string>
     <string name="settings_notification_time" translatable="false">settings_notification_time</string>
     <string name="settings_notification_nb_days_earlier" translatable="false">settings_notification_nb_days_earlier</string>
+    <string name="settings_calendar_months_ahead" translatable="false">settings_calendar_months_ahead</string>
     <string name="settings_app_version" translatable="false">settings_app_version</string>
 
     <string name="default_root_veg_enable" translatable="false">No</string>

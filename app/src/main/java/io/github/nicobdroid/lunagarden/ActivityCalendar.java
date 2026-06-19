@@ -1,6 +1,7 @@
 package io.github.nicobdroid.lunagarden;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,10 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.gms.ads.AdRequest;
@@ -25,9 +28,15 @@ import java.util.Calendar;
 
 public class ActivityCalendar extends AppCompatActivity {
     private static final String TAG = "ActivityCalendar";
+    private static final int DEFAULT_MONTHS_AHEAD = 3;
+    private static final int MIN_MONTHS_AHEAD = 1;
+    private static final int MAX_MONTHS_AHEAD = 12;
+    private static final int CURRENT_MONTH_PAGE_INDEX = 2;
     private static final int MAX_AD_RETRY = 2;
     private static final long AD_RETRY_DELAY_MS = 1500L;
     FragmentPagerAdapter adapterViewPager;
+    private ViewPager vpPager;
+    private int configuredMonthsAhead = -1;
     private AdView adView;
     private int adRetryCount;
     private final Handler adRetryHandler = new Handler(Looper.getMainLooper());
@@ -38,10 +47,8 @@ public class ActivityCalendar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ViewPager vpPager = findViewById(R.id.vpPager);
-        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager(), getApplicationContext());
-        vpPager.setAdapter(adapterViewPager);
-        vpPager.setCurrentItem(2);
+        vpPager = findViewById(R.id.vpPager);
+        setupViewPager();
 
         adView = findViewById(R.id.adView);
         if (adView != null) {
@@ -54,7 +61,7 @@ public class ActivityCalendar extends AppCompatActivity {
                 }
 
                 @Override
-                public void onAdFailedToLoad(LoadAdError loadAdError) {
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     Log.w(TAG, "AdMob banner failed: " + loadAdError.getCode() + " / " + loadAdError.getMessage());
                     if (!isFinishing() && !isDestroyed()) {
                         if (adRetryCount < MAX_AD_RETRY) {
@@ -76,44 +83,62 @@ public class ActivityCalendar extends AppCompatActivity {
 
     }
 
+    private void setupViewPager() {
+        if (vpPager == null) {
+            return;
+        }
+        int monthsAhead = readMonthsAheadPreference();
+        if (monthsAhead == configuredMonthsAhead && adapterViewPager != null && vpPager.getAdapter() != null) {
+            return;
+        }
+        configuredMonthsAhead = monthsAhead;
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager(), getApplicationContext(), monthsAhead);
+        vpPager.setAdapter(adapterViewPager);
+        vpPager.setCurrentItem(CURRENT_MONTH_PAGE_INDEX);
+    }
+
+    private int readMonthsAheadPreference() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String key = getString(R.string.settings_calendar_months_ahead);
+        String storedValue = prefs.getString(key, String.valueOf(DEFAULT_MONTHS_AHEAD));
+        int parsedValue;
+        try {
+            parsedValue = Integer.parseInt(storedValue);
+        } catch (NumberFormatException e) {
+            parsedValue = DEFAULT_MONTHS_AHEAD;
+        }
+        return Math.max(MIN_MONTHS_AHEAD, Math.min(MAX_MONTHS_AHEAD, parsedValue));
+    }
+
 
 
     public static class MyPagerAdapter extends FragmentPagerAdapter {
-        private static final int NUM_ITEMS = 6;
+        private static final int MONTHS_BEFORE_CURRENT = 2;
         Context mContext;
+        private final int monthsAhead;
         static int actualMonth = Calendar.getInstance().get(Calendar.MONTH);
         static int actualYear = Calendar.getInstance().get(Calendar.YEAR);
 
-        public MyPagerAdapter(FragmentManager fragmentManager, Context context) {
+        public MyPagerAdapter(FragmentManager fragmentManager, Context context, int monthsAhead) {
             super(fragmentManager);
             this.mContext = context;
+            this.monthsAhead = monthsAhead;
         }
 
         // Returns total number of pages.
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return MONTHS_BEFORE_CURRENT + 1 + monthsAhead;
         }
 
         // Returns the fragment to display for a particular page.
         @Override
+        @NonNull
         public Fragment getItem(int position) {
-            switch (position) {
-                case 0:
-                    return createFragmentForOffset(-2);
-                case 1:
-                    return createFragmentForOffset(-1);
-                case 2:
-                    return createFragmentForOffset(0);
-                case 3:
-                    return createFragmentForOffset(1);
-                case 4:
-                    return createFragmentForOffset(2);
-                case 5:
-                    return createFragmentForOffset(3);
-                default:
-                    return null;
+            if (position < 0 || position >= getCount()) {
+                throw new IllegalArgumentException("Invalid position: " + position);
             }
+            return createFragmentForOffset(position - MONTHS_BEFORE_CURRENT);
         }
 
         private Fragment createFragmentForOffset(int monthOffset) {
@@ -129,7 +154,7 @@ public class ActivityCalendar extends AppCompatActivity {
             String strPageTitle = null;
             Calendar calendar = Calendar.getInstance();
             calendar.set(actualYear, actualMonth, 1);
-            calendar.add(Calendar.MONTH, position - 2);
+            calendar.add(Calendar.MONTH, position - MONTHS_BEFORE_CURRENT);
             int monthId = calendar.get(Calendar.MONTH);
             switch (monthId) {
                 case Calendar.JANUARY:
@@ -183,6 +208,7 @@ public class ActivityCalendar extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        setupViewPager();
         if (adView != null) {
             adView.resume();
         }
