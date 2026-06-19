@@ -12,6 +12,7 @@
         </Preference>
 
         <ListPreference
+            android:icon="@drawable/courgette"
             android:key="settings_appearance_mode"
             android:title="@string/settings_appearance_title"
             android:summary="@string/settings_appearance_summary"
@@ -62,7 +63,7 @@
         </Preference>
 
         <Preference
-            android:icon="@drawable/chou_pomme_ete"
+            android:icon="@drawable/feuille_epinard"
             android:summary="@string/legal_privacy_summary"
             android:title="@string/legal_privacy_title">
             <intent
