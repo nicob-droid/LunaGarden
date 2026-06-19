@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="fruit_veg_titles">
-        <item>Aubergine</item>
-        <item>Concombre</item>
-        <item>Courge</item>
-        <item>Courgette</item>
-        <item>Feve</item>
-        <item>Haricot vert</item>
-        <item>Piment</item>
-        <item>Poivron</item>
-        <item>Petit pois printemps</item>
-        <item>Petit pois automne</item>
-        <item>Tomate</item>
-        <item>Tournesol</item>
+        <item>Eggplant</item>
+        <item>Cucumber</item>
+        <item>Squash</item>
+        <item>Zucchini</item>
+        <item>Fava bean</item>
+        <item>Green bean</item>
+        <item>Chili pepper</item>
+        <item>Bell pepper</item>
+        <item>Spring pea</item>
+        <item>Autumn pea</item>
+        <item>Tomato</item>
+        <item>Sunflower</item>
     </string-array>
 
     <string-array name="leaf_veg_titles">
-        <item>Blette</item>
-        <item>Chou Bruxelles automne</item>
-        <item>Chou Bruxelles hiver</item>
-        <item>Chou pomme printemps</item>
-        <item>Chou pomme ete</item>
-        <item>Chou pomme automne</item>
-        <item>Chou pomme hiver</item>
-        <item>Chou fleur printemps</item>
-        <item>Chou fleur ete</item>
-        <item>Chou fleur hiver</item>
-        <item>Epinard printemps</item>
-        <item>Epinard jours longs</item>
-        <item>Epinard jours courts</item>
-        <item>Laitue</item>
-        <item>Mache grosses graines</item>
-        <item>Mache petites graines</item>
-        <item>Poireau ete</item>
-        <item>Poireau hiver</item>
-        <item>Roquette</item>
+        <item>Chard</item>
+        <item>Autumn Brussels sprouts</item>
+        <item>Winter Brussels sprouts</item>
+        <item>Spring cabbage</item>
+        <item>Summer cabbage</item>
+        <item>Autumn cabbage</item>
+        <item>Winter cabbage</item>
+        <item>Spring cauliflower</item>
+        <item>Summer cauliflower</item>
+        <item>Winter cauliflower</item>
+        <item>Spring spinach</item>
+        <item>Long-day spinach</item>
+        <item>Short-day spinach</item>
+        <item>Lettuce</item>
+        <item>Lamb\'s lettuce (large seeds)</item>
+        <item>Lamb\'s lettuce (small seeds)</item>
+        <item>Summer leek</item>
+        <item>Winter leek</item>
+        <item>Arugula</item>
     </string-array>
 
     <string-array name="root_veg_titles">
-        <item>Ail blanc</item>
-        <item>Ail rose</item>
-        <item>Betterave</item>
-        <item>Carotte</item>
-        <item>Celeri</item>
-        <item>Cerfeuil</item>
-        <item>Echalote longue</item>
-        <item>Echalote grise</item>
-        <item>Navet printemps</item>
-        <item>Navet hiver</item>
-        <item>Oignon doux</item>
-        <item>Oignon a conserver</item>
-        <item>Panais</item>
-        <item>Pomme de terre</item>
-        <item>Radis</item>
-        <item>Radis hiver</item>
-        <item>Salsifi</item>
-        <item>Scorsonere</item>
+        <item>White garlic</item>
+        <item>Pink garlic</item>
+        <item>Beetroot</item>
+        <item>Carrot</item>
+        <item>Celeriac</item>
+        <item>Chervil</item>
+        <item>Long shallot</item>
+        <item>Gray shallot</item>
+        <item>Spring turnip</item>
+        <item>Winter turnip</item>
+        <item>Sweet onion</item>
+        <item>Storage onion</item>
+        <item>Parsnip</item>
+        <item>Potato</item>
+        <item>Radish</item>
+        <item>Winter radish</item>
+        <item>Salsify</item>
+        <item>Scorzonera</item>
     </string-array>
 </resources>
