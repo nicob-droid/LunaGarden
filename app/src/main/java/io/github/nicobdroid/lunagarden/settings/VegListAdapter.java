@@ -97,7 +97,18 @@ public class VegListAdapter extends BaseAdapter {
 
             viewHolder.checkbox.setTag(position);
             viewHolder.checkbox.setChecked(item.isCheckboxChecked());
-            viewHolder.checkbox.setOnClickListener(view -> listener.onCheckboxClicked(position, item));
+            viewHolder.checkbox.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onCheckboxClicked(position, item);
+                }
+            });
+
+            // Le clic sur toute la ligne declenche la meme action que la checkbox.
+            convertView.setOnClickListener(view -> {
+                if (listener != null) {
+                    listener.onCheckboxClicked(position, item);
+                }
+            });
 
         }
         return convertView;

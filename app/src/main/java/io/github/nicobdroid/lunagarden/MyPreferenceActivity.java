@@ -21,6 +21,7 @@ public class MyPreferenceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdgeHelper.applyToContentRoot(this);
         if (savedInstanceState == null) {
             getSupportFragmentManager()
                     .beginTransaction()

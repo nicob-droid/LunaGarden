@@ -29,6 +29,7 @@ public class LegalDocumentActivity extends AppCompatActivity {
         WebView webView = new WebView(this);
         webView.setWebViewClient(new WebViewClient());
         setContentView(webView);
+        EdgeToEdgeHelper.applyToContentRoot(this);
 
         String pageUrl = getIntent().getStringExtra(EXTRA_LEGAL_URL);
         if (pageUrl != null && !pageUrl.isEmpty()) {

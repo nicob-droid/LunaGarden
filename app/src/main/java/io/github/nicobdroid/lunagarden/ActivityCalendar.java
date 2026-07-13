@@ -46,6 +46,7 @@ public class ActivityCalendar extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        EdgeToEdgeHelper.apply(this, R.id.root_main);
 
         vpPager = findViewById(R.id.vpPager);
         setupViewPager();
