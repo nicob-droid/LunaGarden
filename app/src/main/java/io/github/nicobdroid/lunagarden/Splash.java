@@ -11,6 +11,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.splashscreen.SplashScreen;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -82,6 +84,7 @@ public class Splash extends AppCompatActivity {
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		SplashScreen.installSplashScreen(this);
 
 		/* Default creation code. */
 		AppearanceModeManager.applySavedMode(this);
